@@ -40,7 +40,6 @@
   
   <!-- Preload Critical Images -->
   <link rel="preload" as="image" href="01-IMAGES/logo_reach.webp">
-  <link rel="preload" as="image" href="01-IMAGES/hero/COACH.webp">
   <link rel="preload" as="image" href="01-IMAGES/banniere.webp">
   
   <!-- Google Tag Manager - Optimized Loading -->
@@ -190,68 +189,27 @@
     .hero {
       position: relative;
       color: #fff;
-      padding: 60px 20px 0;
-      overflow: hidden;
-      background: #141414;
-    }
-    
-    /* Mosaïque Background */
-    .hero-mosaic {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      grid-template-rows: repeat(2, 1fr);
-      opacity: 0.20;
-      z-index: 0;
-    }
-    
-    .hero-mosaic img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
+      padding: 80px 20px 100px;
+      background: linear-gradient(180deg, #111111 0%, #141414 60%, #111111 100%);
     }
     
     /* Hero Content */
     .hero-content {
       position: relative;
       z-index: 1;
-      display: grid;
-      grid-template-columns: 200px 1fr;
-      gap: 40px;
-      align-items: center;
-      max-width: 1200px;
+      max-width: 760px;
       margin: 0 auto;
-      min-height: 400px;
-    }
-    
-    /* Photo Coach - Premier plan à GAUCHE */
-    .hero-coach {
-      width: 100%;
-      max-width: 200px;
-      position: relative;
-      z-index: 1;
-      filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.6));
-      background: transparent;
-      align-self: end;
-      margin-bottom: 0;
-    }
-    
-    .hero-coach img {
-      width: 100%;
-      height: auto;
-      display: block;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 24px;
     }
     
     .hero-text {
-      text-align: center;
       align-self: center;
       position: relative;
       z-index: 2;
-      margin-left: -80px;
     }
     
     .hero h1 {
@@ -324,6 +282,7 @@
       line-height: 1.25;
       color: #000000;
       letter-spacing: -0.02em;
+      text-wrap: balance;
     }
     
     h3 {
@@ -332,6 +291,7 @@
       font-weight: 700;
       margin-bottom: 15px;
       color: #ff6413;
+      text-wrap: balance;
     }
     
     p {
@@ -340,6 +300,7 @@
       line-height: 1.75;
       color: #333;
       font-weight: 400;
+      text-wrap: pretty;
     }
     
     /* Testimonials Carousel Section */
@@ -558,198 +519,280 @@
     /* Pricing Section */
     .pricing-section {
       background: #f8f9fa;
-      padding: 50px 20px 45px;
+      padding: 60px 20px 40px;
+    }
+    
+    .pricing-header {
+      text-align: center;
+      max-width: 720px;
+      margin: 0 auto 30px;
+    }
+    
+    .pricing-header h2 {
+      font-size: clamp(30px, 5vw, 48px);
+      font-weight: 700;
+      color: #000;
+      margin-bottom: 12px;
+      letter-spacing: -0.02em;
+    }
+    
+    .pricing-header p {
+      color: #555;
+      font-size: 18px;
+    }
+    
+    .pricing-controls {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 30px;
+    }
+    
+    .currency-select-wrapper {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      background: #fff;
+      border: 2px solid #ff6413;
+      border-radius: 40px;
+      padding: 10px 18px;
+      box-shadow: 0 8px 25px rgba(255, 100, 19, 0.12);
+    }
+    
+    .currency-select-wrapper span {
+      font-weight: 600;
+      font-size: 15px;
+      color: #000;
+    }
+    
+    .currency-select {
+      border: none;
+      font-size: 15px;
+      font-weight: 600;
+      background: transparent;
+      color: #ff6413;
+      cursor: pointer;
+      outline: none;
+      appearance: none;
+      padding-right: 20px;
+    }
+    
+    .currency-select option {
+      color: #000;
+    }
+    
+    .pricing-box {
+      background: transparent;
     }
     
     .pricing-cards-container {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 20px;
+      gap: 24px;
       max-width: 1200px;
-      margin: 25px auto 30px;
+      margin: 25px auto 35px;
     }
     
     .pricing-card {
-      background: #fff;
-      border: 3px solid #ff6413;
-      border-radius: 12px;
-      padding: 25px 20px;
+      background: linear-gradient(180deg, #fff4eb 0%, #ffe0cd 100%);
+      border-radius: 28px;
+      padding: 48px 28px 36px;
       text-align: center;
       position: relative;
+      overflow: hidden;
+      box-shadow: 0 25px 40px rgba(255, 100, 19, 0.22);
       transition: transform 0.3s ease, box-shadow 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
     }
     
-    .pricing-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 10px 30px rgba(255, 100, 19, 0.2);
+    .pricing-card::before {
+      content: "";
+      position: absolute;
+      top: -120px;
+      left: -40px;
+      width: 220px;
+      height: 220px;
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.6) 0%, transparent 70%);
+      opacity: 0.6;
+      pointer-events: none;
+    }
+    
+    .pricing-card:nth-child(2) {
+      background: linear-gradient(180deg, #ffe6d6 0%, #ffc8a3 100%);
     }
     
     .pricing-card.best-value {
-      border-width: 4px;
+      background: linear-gradient(180deg, #ffd5b4 0%, #ff9f54 100%);
+      box-shadow: 0 28px 45px rgba(255, 125, 37, 0.35);
+    }
+    
+    .pricing-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 35px 55px rgba(255, 100, 19, 0.28);
+    }
+    
+    .best-value-badge,
+    .most-popular-badge {
+      position: absolute;
+      top: 12px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 7px 16px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      background: rgba(0, 0, 0, 0.75);
+      color: #fff;
+      box-shadow: 0 8px 18px rgba(0,0,0,0.2);
     }
     
     .best-value-badge {
-      position: absolute;
-      top: -15px;
-      right: 20px;
+      right: 24px;
       background: #ff6413;
-      color: #fff;
-      padding: 8px 20px;
-      border-radius: 25px;
-      font-size: 13px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
     }
     
-    .pricing-card h3 {
-      font-family: 'Inter', sans-serif;
+    .most-popular-badge {
+      left: 24px;
+    }
+    
+    .plan-title {
       font-size: 22px;
       font-weight: 700;
-      color: #000;
-      margin-bottom: 15px;
+      color: #1a1a1a;
+      margin: 0;
+      letter-spacing: 0.02em;
     }
     
-    .pricing-card .price {
-      font-family: 'Inter', sans-serif;
+    .price-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      margin-top: 8px;
+    }
+    
+    .price {
       font-size: 44px;
-      font-weight: 700;
+      font-weight: 800;
       color: #ff6413;
       line-height: 1;
-      margin-bottom: 8px;
+      letter-spacing: -0.02em;
     }
     
-    .pricing-card .price-detail {
+    .price-detail {
       font-size: 15px;
-      color: #999;
-      margin-bottom: 20px;
+      color: #5c5c5c;
     }
     
-    .pricing-features {
+    .plan-saving {
+      display: none;
+      background: rgba(23, 162, 74, 0.14);
+      color: #14703a;
+      border-radius: 999px;
+      padding: 6px 16px;
+      font-size: 13px;
+      font-weight: 600;
+      margin-top: 6px;
+      gap: 8px;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .plan-saving::before {
+      content: "💰";
+      font-size: 16px;
+    }
+    
+    .plan-features {
       list-style: none;
       padding: 0;
-      margin: 15px 0 20px;
-      text-align: left;
+      margin: 12px 0 0;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
     }
     
-    .pricing-features li {
-      padding: 6px 0 6px 28px;
-      position: relative;
+    .plan-features li {
       font-size: 14px;
-      color: #333;
-      line-height: 1.3;
+      color: #3d3d3d;
+      position: relative;
+      padding-bottom: 12px;
     }
     
-    .pricing-features li:before {
-      content: "✓";
+    .plan-features li:not(:last-child)::after {
+      content: "";
       position: absolute;
       left: 0;
-      color: #ff6413;
-      font-weight: bold;
-      font-size: 18px;
+      right: 0;
+      bottom: 0;
+      border-bottom: 1px dashed rgba(0, 0, 0, 0.12);
     }
     
-    .pricing-card .btn {
-      width: 100%;
-      padding: 14px 25px;
-      font-size: 15px;
+    .plan-features .feature-whatsapp {
+      font-weight: 600;
+      color: #1f7a46;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    
+    .plan-features .feature-whatsapp::before {
+      content: "📲";
+    }
+    
+    .no-break {
+      white-space: nowrap;
+    }
+    
+    .plan-button {
+      margin-top: auto;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 26px;
+      border-radius: 999px;
+      border: 2px solid #ff6413;
+      background: #ffffff;
+      color: #ff6413;
+      font-size: 14px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      text-decoration: none;
+      transition: all 0.25s ease;
+      box-shadow: 0 6px 18px rgba(255, 100, 19, 0.18);
+      margin-top: 16px;
+    }
+    
+    .plan-button:hover {
+      background: #ff6413;
+      color: #fff;
+      box-shadow: 0 10px 26px rgba(255, 100, 19, 0.28);
+      transform: translateY(-2px);
     }
     
     .trial-note {
       background: linear-gradient(135deg, #fff9f5 0%, #ffffff 100%);
-      border: 3px solid #ff6413;
+      border: 2px solid rgba(255, 100, 19, 0.45);
       border-radius: 16px;
-      padding: 25px 30px;
-      max-width: 700px;
-      margin: 0 auto;
-      text-align: center;
-      box-shadow: 0 4px 20px rgba(255, 100, 19, 0.15);
-      position: relative;
-      overflow: hidden;
-    }
-    
-    .trial-note::before {
-      content: '';
-      position: absolute;
-      top: -50%;
-      right: -50%;
-      width: 200%;
-      height: 200%;
-      background: radial-gradient(circle, rgba(255, 100, 19, 0.05) 0%, transparent 70%);
-      pointer-events: none;
-    }
-    
-    .trial-note-content {
-      position: relative;
-      z-index: 1;
-    }
-    
-    .trial-note h3 {
-      font-family: 'Inter', sans-serif;
-      font-size: 24px;
-      font-weight: 700;
-      color: #000;
-      margin-bottom: 15px;
-      line-height: 1.2;
-    }
-    
-    .trial-note p {
-      margin: 0 0 25px 0;
-      font-size: 17px;
+      padding: 22px 24px;
+      margin-top: 30px;
+      font-size: 16px;
       line-height: 1.6;
       color: #333;
+      position: relative;
     }
     
-    .trial-note .trial-price {
-      background: linear-gradient(180deg, transparent 50%, rgba(255, 100, 19, 0.3) 50%);
+    .trial-note strong {
+      color: #ff6413;
       font-weight: 700;
-      color: #000;
-      padding: 0 4px;
-    }
-    
-    .trial-cta-btn {
-      display: inline-block;
-      background: #ff6413;
-      color: #fff;
-      padding: 14px 35px;
-      font-size: 16px;
-      font-weight: 600;
-      text-decoration: none;
-      border-radius: 50px;
-      transition: all 0.3s ease;
-      border: none;
-      cursor: pointer;
-      letter-spacing: 0.3px;
-      font-family: 'Inter', sans-serif;
-      box-shadow: 0 4px 15px rgba(255, 100, 19, 0.3);
-    }
-    
-    .trial-cta-btn:hover {
-      background: #e55510;
-      transform: translateY(-2px);
-      box-shadow: 0 6px 25px rgba(255, 100, 19, 0.4);
-    }
-    
-    .trial-cta-btn svg {
-      display: inline-block;
-      width: 20px;
-      height: 20px;
-      margin-right: 8px;
-      vertical-align: middle;
-      fill: white;
-    }
-    
-    .pricing-disclaimer {
-      text-align: center;
-      max-width: 800px;
-      margin: 30px auto 0;
-    }
-    
-    .pricing-disclaimer p {
-      font-size: 14px;
-      color: #666;
-      margin: 5px 0;
-      line-height: 1.5;
     }
     
     /* FAQ Accordion */
@@ -1006,6 +1049,57 @@
       border-radius: 6px;
     }
     
+    .what-you-get {
+      margin-top: 18px;
+      padding: 18px 22px;
+      border-radius: 14px;
+      background: rgba(255, 100, 19, 0.08);
+      border: 1px solid rgba(255, 100, 19, 0.25);
+      backdrop-filter: blur(6px);
+      text-align: left;
+      max-width: 360px;
+    }
+    
+    .timeline-text.text-right .what-you-get {
+      margin-left: auto;
+    }
+    
+    .what-you-get-title {
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      color: #ff6413;
+      margin-bottom: 12px;
+    }
+    
+    .what-you-get-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: grid;
+      gap: 10px;
+    }
+    
+    .what-you-get-list li {
+      position: relative;
+      padding-left: 26px;
+      font-size: 15px;
+      line-height: 1.5;
+      color: rgba(255, 255, 255, 0.88);
+    }
+    
+    .what-you-get-list li:before {
+      content: "✓";
+      position: absolute;
+      left: 0;
+      top: 0;
+      color: #ff6413;
+      font-weight: 700;
+      font-size: 18px;
+      line-height: 1;
+    }
+    
     /* CTA Section */
     .cta-section {
       padding: 50px 20px;
@@ -1130,29 +1224,13 @@
         max-width: 600px;
       }
       
+      .hero {
+        padding: 70px 15px 80px;
+      }
+      
       .hero-content {
-        display: flex;
-        flex-direction: column;
-        gap: 30px;
-        min-height: 400px;
-        padding: 30px 15px;
-      }
-      
-      .hero-coach {
-        max-width: 200px;
-        margin: 0 auto;
-        order: 3;
-      }
-      
-      .hero-text {
-        text-align: center;
-        margin-left: 0;
-        order: 1;
-      }
-      
-      .hero-mosaic {
-        grid-template-columns: repeat(2, 1fr);
-        grid-template-rows: repeat(3, 1fr);
+        max-width: 540px;
+        gap: 20px;
       }
       
       /* Timeline responsive - passer en vertical avec ligne à gauche */
@@ -1194,6 +1272,14 @@
         margin-bottom: 20px;
       }
       
+      .what-you-get {
+        max-width: 100%;
+      }
+      
+      .timeline-text.text-right .what-you-get {
+        margin-left: 0;
+      }
+      
       .timeline-image {
         max-width: 100% !important;
       }
@@ -1222,22 +1308,13 @@
       }
       
       .hero {
-        padding: 50px 15px 0;
+        padding: 60px 15px 70px;
       }
       
       .hero-content {
-        min-height: 350px;
-        padding: 20px 10px;
-        gap: 25px;
-      }
-      
-      .hero-coach {
-        max-width: 180px;
-        order: 3;
-      }
-      
-      .hero-text {
-        order: 1;
+        max-width: 100%;
+        padding: 0 5px;
+        gap: 18px;
       }
       
       section {
@@ -1349,6 +1426,10 @@
         opacity: 1;
       }
       
+      .what-you-get {
+        max-width: 100%;
+      }
+      
       .pricing-cards-container {
         grid-template-columns: 1fr;
         gap: 18px;
@@ -1356,67 +1437,24 @@
       }
       
       .pricing-card {
-        padding: 20px 18px;
+        padding: 44px 24px 32px;
       }
       
-      .pricing-card h3 {
-        font-size: 20px;
-        margin-bottom: 12px;
+      .plan-features {
+        gap: 10px;
       }
       
-      .best-value-badge {
-        top: -12px;
-        right: 15px;
-        font-size: 11px;
-        padding: 6px 16px;
-      }
-      
-      .pricing-card .price {
-        font-size: 38px;
-        margin-bottom: 6px;
-      }
-      
-      .pricing-card .price-detail {
-        font-size: 14px;
-        margin-bottom: 15px;
-      }
-      
-      .pricing-features {
-        margin: 12px 0 18px;
-      }
-      
-      .pricing-features li {
-        padding: 5px 0 5px 25px;
+      .plan-features li {
         font-size: 13px;
       }
       
-      .pricing-card .btn {
-        padding: 12px 20px;
-        font-size: 14px;
+      .plan-button {
+        width: 100%;
+        margin-top: 14px;
       }
       
       .trial-note {
         padding: 25px 20px;
-      }
-      
-      .trial-note h3 {
-        font-size: 20px;
-      }
-      
-      .trial-note p {
-        font-size: 15px;
-      }
-      
-      .trial-cta-btn {
-        padding: 12px 30px;
-        font-size: 15px;
-        width: 100%;
-        max-width: 280px;
-      }
-      
-      .trial-cta-btn svg {
-        width: 18px;
-        height: 18px;
       }
       
       .faq-container {
@@ -1549,16 +1587,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
 <!-- Hero Section -->
 <section class="hero">
-  <!-- Mosaïque Background -->
-  <div class="hero-mosaic">
-    <img src="01-IMAGES/hero/19.03.2023 (305 of 403).webp" alt="" loading="lazy">
-    <img src="01-IMAGES/hero/body-transformation-program.webp" alt="" loading="lazy">
-    <img src="01-IMAGES/hero/personal-fitness-training-services.webp" alt="" loading="lazy">
-    <img src="01-IMAGES/hero/body-transformation.webp" alt="" loading="lazy">
-    <img src="01-IMAGES/hero/Sarah-session.webp" alt="" loading="lazy">
-    <img src="01-IMAGES/hero/19.03.2023 (327 of 403).webp" alt="" loading="lazy">
-  </div>
-  
   <div class="container" style="max-width: 1200px; position: relative; z-index: 1;">
     <!-- Clients Row -->
     <div class="clients-row">
@@ -1569,17 +1597,12 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     </div>
     
     <div class="hero-content">
-      <!-- Photo Coach - Premier plan à GAUCHE -->
-      <div class="hero-coach">
-        <img src="01-IMAGES/hero/COACH.webp" alt="Antoine - Personal Coach at NOGS Dubai" loading="eager" width="640" height="1632">
-      </div>
-      
       <!-- Accroche CENTRÉE -->
       <div class="hero-text">
-        <h1>What if you could drop up to 10kg+ training just 3 times per&nbsp;week</h1>
-        <p>80% of your results will come from showing up consistently and doing the right exercises. This coaching program makes sure you do both.</p>
+        <h1>You know HOW to train. You just need someone to make sure you actually do it, consistently.</h1>
+        <p>Stop wasting time second-guessing your workouts. Get a personalized program, weekly check-ins, and direct access to a coach who keeps you accountable, wherever you train.</p>
         <div style="margin-top: 30px;">
-          <a href="https://wa.me/971585922694?text=Hi%20Antoine,%20I'm%20interested%20in%20your%20coaching%20program%20at%20NOGS" class="btn" onclick="trackEvent('cta_click', {button_location: 'hero_section', button_text: 'Message me on WhatsApp'}); fbq('track', 'Contact');">Message me on WhatsApp</a>
+          <a href="https://wa.me/971585922694?text=Hi%20Antoine,%20I'm%20interested%20in%20your%20coaching%20program%20at%20NOGS" class="btn" onclick="trackEvent('cta_click', {button_location: 'hero_section', button_text: 'Start Your 7-Day Trial'}); fbq('track', 'Contact');">Start Your 7-Day Trial</a>
         </div>
         <p style="margin-top: 15px; font-size: 16px; color: rgba(255, 255, 255, 0.82);">No pressure. Just a quick chat to see if we're a fit.</p>
       </div>
@@ -1811,27 +1834,27 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
 <!-- Location Callout -->
 <div class="location-box">
-  <p><strong>📍 TRAINING LOCATION: NOGS, Al Quoz</strong></p>
-  <p>All sessions take place at NOGS - one of Dubai's best performance gyms. Focused, top-tier equipment.</p>
-  <p style="margin-bottom: 0;"><strong>If you can't train here, this isn't for you.</strong></p>
+  <p><strong>TRAIN ANYWHERE, ANYTIME</strong></p>
+  <p>Your gym. Hotel gym. Home setup. Traveling. It doesn't matter. You get a program designed for YOUR equipment and YOUR schedule.</p>
+  <p style="margin-bottom: 0;">No commute. No traffic. Just results.</p>
 </div>
 
 <!-- Pain Points Section -->
 <section>
   <div class="container">
-    <h2 style="text-align: center;">Let Me Guess... You've Tried the Apps, the Programs, the Generic Gym Plans. And You're Still&nbsp;Stuck.</h2>
-    <p style="text-align: center; max-width: 700px; margin: 0 auto 30px;">Here's the problem: apps can't watch your form. Programs don't adjust when life gets messy. And generic plans don't know YOU.</p>
-    <p style="text-align: center; font-weight: 600; font-size: 20px;">This is different. This is face-to-face coaching.</p>
-    <p style="text-align: center; margin-bottom: 30px;">You show up. I handle everything else.</p>
+    <h2 style="text-align: center;">You've tried doing it alone. And you know what happened.</h2>
+    <p style="text-align: center; max-width: 700px; margin: 0 auto 30px;">You started strong. Then life got busy. You missed a workout. Then another. Then you stopped tracking. And before you knew it, you were back to square one.</p>
+    <p style="text-align: center; font-weight: 600; font-size: 20px;">Not because you didn't know what to do. But because no one was there to make sure you did it.</p>
+    <p style="text-align: center; margin-bottom: 30px;">That's what online coaching fixes.</p>
     
     <h3 style="text-align: center; margin-top: 40px;">This is for you if:</h3>
     <ul class="pain-list">
-      <li>You're carrying 10kg+ you want gone</li>
-      <li>You're tired of yo-yo dieting and BS advice</li>
-      <li>You want energy back, not just weight loss</li>
-      <li>You can train at NOGS, Al Quoz (this is non-negotiable)</li>
-      <li>You're ready to invest in yourself properly</li>
-      <li>You want a coach who actually shows up, not a PDF</li>
+      <li>You know how to train but lack structure and accountability</li>
+      <li>You want to train at your own gym or while traveling</li>
+      <li>You're tired of cookie-cutter programs that don't fit your life</li>
+      <li>You need someone to check in and keep you on track</li>
+      <li>You want direct access to a coach, not just an app</li>
+      <li>You're ready to stop starting over and actually stick to it</li>
     </ul>
   </div>
 </section>
@@ -1873,9 +1896,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <div class="carousel-dots" id="carouselDots"></div>
   </div>
   
-  <p style="text-align: center; margin-top: 30px; font-size: 15px; color: #666; font-weight: 400;">Limited spots. Face-to-face coaching only.</p>
+  <p style="text-align: center; margin-top: 30px; font-size: 15px; color: #666; font-weight: 400;">Limited spots available for online coaching.</p>
   <div style="text-align: center; margin-top: 25px;">
-    <a href="https://wa.me/971585922694?text=Hi%20Antoine,%20I'm%20interested%20in%20your%20coaching%20program%20at%20NOGS" class="btn" onclick="trackEvent('cta_click', {button_location: 'testimonials_section', button_text: 'Message me on WhatsApp'}); fbq('track', 'Contact');">Message me on WhatsApp</a>
+    <a href="https://wa.me/971585922694?text=Hi%20Antoine,%20I'm%20interested%20in%20your%20coaching%20program%20at%20NOGS" class="btn" onclick="trackEvent('cta_click', {button_location: 'testimonials_section', button_text: 'Start Your 7-Day Trial'}); fbq('track', 'Contact');">Start Your 7-Day Trial</a>
   </div>
   
   <script>
@@ -1981,9 +2004,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   <div style="max-width: 1200px; margin: 0 auto;">
     <!-- Accroche principale -->
     <div style="text-align: center; margin-bottom: 80px;">
-      <h2 style="font-size: clamp(36px, 5vw, 56px); font-weight: 700; margin-bottom: 30px; color: #fff;">This is what changes when you stop doing it&nbsp;alone.</h2>
+      <h2 style="font-size: clamp(36px, 5vw, 56px); font-weight: 700; margin-bottom: 30px; color: #fff;">Here's what coaching actually looks like.</h2>
       
-      <p style="max-width: 800px; margin: 0 auto; font-size: 20px; color: #ccc; line-height: 1.6;">I promise that at the end of every session, you'll know it was worth showing up.</p>
+      <p style="max-width: 800px; margin: 0 auto; font-size: 20px; color: #ccc; line-height: 1.6;">Not just a list of features. This is what changes when you stop doing it alone.</p>
     </div>
     
     <div class="timeline-container" style="position: relative; padding-top: 60px; padding-bottom: 60px;">
@@ -1996,8 +2019,17 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <!-- Item 1 -->
       <div class="timeline-item" style="display: grid; grid-template-columns: 1fr 80px 1fr; gap: 60px; align-items: center; margin-bottom: 120px; position: relative;">
         <div class="timeline-text text-right" style="text-align: right;">
-          <h3 style="font-size: clamp(24px, 3vw, 32px); font-weight: 700; margin-bottom: 15px; color: #fff;">You finally stop thinking. You just show up and it gets&nbsp;done.</h3>
-          <p style="font-size: 17px; color: #ccc; line-height: 1.6;">Your program is designed for YOUR goals, YOUR body, YOUR abilities. And it's a training you'll finally enjoy and want to&nbsp;do.</p>
+          <h3 style="font-size: clamp(24px, 3vw, 32px); font-weight: 700; margin-bottom: 15px; color: #ff6413;">You stop wasting time wondering what to do.</h3>
+          <p style="font-size: 17px; color: #ccc; line-height: 1.6;">Open the app. Your workout is there. Your nutrition is there. Your progress is tracked. Everything is planned. You just execute.</p>
+          <div class="what-you-get">
+            <p class="what-you-get-title">What you get:</p>
+            <ul class="what-you-get-list">
+              <li>Custom training program (updated weekly)</li>
+              <li>Personalized macros &amp; daily targets</li>
+              <li>Video demos for every exercise</li>
+              <li>All-in-one app (no jumping between tools)</li>
+            </ul>
+          </div>
         </div>
         <div class="timeline-badge" style="display: flex; justify-content: center; z-index: 2;">
           <div style="width: 70px; height: 70px; background: #ff6413; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 36px; font-weight: 700; color: #fff; border: 6px solid #000;">1</div>
@@ -2010,8 +2042,16 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <!-- Item 2 -->
       <div class="timeline-item" style="display: grid; grid-template-columns: 1fr 80px 1fr; gap: 60px; align-items: center; margin-bottom: 120px; position: relative;">
         <div class="timeline-text text-right" style="text-align: right;">
-          <h3 style="font-size: clamp(24px, 3vw, 32px); font-weight: 700; margin-bottom: 15px; color: #fff;">You finally make progress that you can feel and&nbsp;see.</h3>
-          <p style="font-size: 17px; color: #ccc; line-height: 1.6;">We track everything. Strength gains. Body composition. Energy levels. You see the results week after&nbsp;week.</p>
+          <h3 style="font-size: clamp(24px, 3vw, 32px); font-weight: 700; margin-bottom: 15px; color: #ff6413;">Someone's checking in.<br><span class="no-break">Every. Single. Week.</span></h3>
+          <p style="font-size: 17px; color: #ccc; line-height: 1.6;">You don't disappear for three weeks and come back guilty. You check in weekly. We review what worked, what didn't, and we adjust.</p>
+          <div class="what-you-get">
+            <p class="what-you-get-title">What you get:</p>
+            <ul class="what-you-get-list">
+              <li>Weekly progress reviews</li>
+              <li>Program adjustments based on your feedback</li>
+              <li>No autopilot BS&mdash;real coaching</li>
+            </ul>
+          </div>
         </div>
         <div class="timeline-badge" style="display: flex; justify-content: center; z-index: 2;">
           <div style="width: 70px; height: 70px; background: #ff6413; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 36px; font-weight: 700; color: #fff; border: 6px solid #000;">2</div>
@@ -2024,8 +2064,16 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <!-- Item 3 -->
       <div class="timeline-item" style="display: grid; grid-template-columns: 1fr 80px 1fr; gap: 50px; align-items: center; position: relative;">
         <div class="timeline-text text-right" style="text-align: right;">
-          <h3 style="font-size: clamp(24px, 3vw, 32px); font-weight: 700; margin-bottom: 15px; color: #fff;">The support doesn't stop when you leave the&nbsp;gym.</h3>
-          <p style="font-size: 17px; color: #ccc; line-height: 1.6;">I'm available on WhatsApp between sessions. Struggling? Send me a message. Need advice? I'm there. This isn't just 3 sessions a week, it's ongoing support to keep you on track when it matters&nbsp;most.</p>
+          <h3 style="font-size: clamp(24px, 3vw, 32px); font-weight: 700; margin-bottom: 15px; color: #ff6413;">You have someone who actually cares.</h3>
+          <p style="font-size: 17px; color: #ccc; line-height: 1.6;">Got a question at 10pm? Send it. Feeling stuck? Message me. This isn't a faceless app. It's real coaching.</p>
+          <div class="what-you-get">
+            <p class="what-you-get-title">What you get:</p>
+            <ul class="what-you-get-list">
+              <li>Direct WhatsApp access to me (not a bot)</li>
+              <li>Support when you need it, not just scheduled calls</li>
+              <li>A coach who's invested in your success</li>
+            </ul>
+          </div>
         </div>
         <div class="timeline-badge" style="display: flex; justify-content: center; z-index: 2;">
           <div style="width: 70px; height: 70px; background: #ff6413; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 36px; font-weight: 700; color: #fff; border: 6px solid #000;">3</div>
@@ -2096,70 +2144,585 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <!-- Pricing Section -->
 <section class="pricing-section" id="pricing">
   <div class="container" style="max-width: 1200px;">
-    <h2 style="text-align: center;">Right. Let's Talk Pricing.</h2>
-    <p style="text-align: center; max-width: 700px; margin: 0 auto 30px; color: #333;">I'm not going to make you "book a call" to find out prices. That's sales BS. Here's how it works:</p>
-    
+    <div class="pricing-header">
+      <h2>What does real coaching actually cost?</h2>
+      <p>Most people spend <span style="font-weight: 700; color: #3a3a3a;">a lot every month</span> on a gym membership they barely use + random supplements + "trying" different programs.</p>
+      <p style="margin-top: 12px; font-weight: 700; color: #222222;">Here, you get everything: Training. Nutrition. Weekly coaching. Direct support. One package. No guessing.</p>
+    </div>
+
+    <div class="pricing-controls">
+      <label class="currency-select-wrapper" for="currencySelect">
+        <span>Currency:</span>
+        <select id="currencySelect" class="currency-select">
+          <option value="AED">AED 🇦🇪</option>
+          <option value="AUD">AUD 🇦🇺</option>
+          <option value="EUR">EUR 🇪🇺</option>
+        </select>
+      </label>
+    </div>
+
     <div class="pricing-cards-container">
-      <!-- 6 Sessions Package Card -->
-      <div class="pricing-card">
-        <h3>6 Sessions Package</h3>
-        <div class="price">2,400 AED</div>
-        <div class="price-detail">(400 AED/session)</div>
-        
-        <a href="https://wa.me/971585922694?text=Hi%20Antoine,%20I%20want%20to%20book%20the%206%20Sessions%20Package" class="btn" onclick="trackEvent('package_click', {package_name: '6 Sessions Package', package_price: '2400', currency: 'AED', button_text: 'Book your free trial session'}); fbq('track', 'InitiateCheckout', {value: 2400, currency: 'AED', content_name: '6 Sessions Package'});" style="margin-top: 15px;">Book your free trial session</a>
+      <div class="pricing-card" data-plan-months="3" data-save-aed="0">
+        <h3 class="plan-title">3 Months</h3>
+        <div class="price-wrapper">
+          <div class="price" data-plan-total></div>
+          <div class="price-detail" data-plan-monthly></div>
+          <div class="plan-saving" data-plan-saving></div>
+        </div>
+        <ul class="plan-features">
+          <li>Full app access</li>
+          <li>Custom training program</li>
+          <li>Nutrition guidance</li>
+          <li>Weekly check-ins</li>
+          <li class="feature-whatsapp">WhatsApp support</li>
+        </ul>
+        <a href="https://wa.me/971585922694?text=Hi%20Antoine,%20I'm%20ready%20to%20start%20the%203%20month%20online%20coaching" class="plan-button" onclick="trackEvent('package_click', {package_name: '3 Months Online', button_text: 'Subscribe'}); fbq('track', 'InitiateCheckout', {value: 0, currency: 'AED', content_name: '3 Months Online'});">Subscribe</a>
       </div>
-      
-      <!-- 8 Sessions Package Card -->
-      <div class="pricing-card">
-        <h3>8 Sessions Package</h3>
-        <div class="price">2,800 AED</div>
-        <div class="price-detail">(350 AED/session)</div>
-        
-        <a href="https://wa.me/971585922694?text=Hi%20Antoine,%20I%20want%20to%20book%20the%208%20Sessions%20Package" class="btn" onclick="trackEvent('package_click', {package_name: '8 Sessions Package', package_price: '2800', currency: 'AED', button_text: 'Book your free trial session'}); fbq('track', 'InitiateCheckout', {value: 2800, currency: 'AED', content_name: '8 Sessions Package'});" style="margin-top: 15px;">Book your free trial session</a>
+
+      <div class="pricing-card" data-plan-months="6" data-save-aed="600">
+        <div class="most-popular-badge">Most popular</div>
+        <h3 class="plan-title">6 Months</h3>
+        <div class="price-wrapper">
+          <div class="price" data-plan-total></div>
+          <div class="price-detail" data-plan-monthly></div>
+          <div class="plan-saving" data-plan-saving=""></div>
+        </div>
+        <ul class="plan-features">
+          <li>Full app access</li>
+          <li>Custom training program</li>
+          <li>Nutrition guidance</li>
+          <li>Weekly check-ins</li>
+          <li class="feature-whatsapp">WhatsApp support</li>
+        </ul>
+        <a href="https://wa.me/971585922694?text=Hi%20Antoine,%20I'm%20ready%20to%20start%20the%206%20month%20online%20coaching" class="plan-button" onclick="trackEvent('package_click', {package_name: '6 Months Online', button_text: 'Subscribe'}); fbq('track', 'InitiateCheckout', {value: 0, currency: 'AED', content_name: '6 Months Online'});">Subscribe</a>
       </div>
-      
-      <!-- 12 Sessions Package Card - BEST VALUE -->
-      <div class="pricing-card best-value">
-        <div class="best-value-badge">BEST VALUE</div>
-        <h3>12 Sessions Package</h3>
-        <div class="price">3,600 AED</div>
-        <div class="price-detail">(300 AED/session)</div>
-        
-        <a href="https://wa.me/971585922694?text=Hi%20Antoine,%20I%20want%20to%20book%20the%2012%20Sessions%20Package" class="btn" onclick="trackEvent('package_click', {package_name: '12 Sessions Package', package_price: '3600', currency: 'AED', button_text: 'Book your free trial session'}); fbq('track', 'InitiateCheckout', {value: 3600, currency: 'AED', content_name: '12 Sessions Package'});" style="margin-top: 15px;">Book your free trial session</a>
+
+      <div class="pricing-card best-value" data-plan-months="12" data-save-aed="4000">
+        <div class="best-value-badge">Best value</div>
+        <h3 class="plan-title">12 Months</h3>
+        <div class="price-wrapper">
+          <div class="price" data-plan-total></div>
+          <div class="price-detail" data-plan-monthly></div>
+          <div class="plan-saving" data-plan-saving></div>
+        </div>
+        <ul class="plan-features">
+          <li>Full app access</li>
+          <li>Custom training program</li>
+          <li>Nutrition guidance</li>
+          <li>Weekly check-ins</li>
+          <li class="feature-whatsapp">WhatsApp support</li>
+        </ul>
+        <a href="https://wa.me/971585922694?text=Hi%20Antoine,%20I'm%20ready%20to%20start%20the%2012%20month%20online%20coaching" class="plan-button" onclick="trackEvent('package_click', {package_name: '12 Months Online', button_text: 'Subscribe'}); fbq('track', 'InitiateCheckout', {value: 0, currency: 'AED', content_name: '12 Months Online'});">Subscribe</a>
       </div>
     </div>
-    
-    <div class="pricing-disclaimer">
-      <p>* Does not include NOGS gym membership</p>
-      <p>* Sessions are 60 minutes, fully personalized</p>
-    </div>
-    
+
     <div class="trial-note">
-      <div class="trial-note-content">
-        <h3>Not Sure Yet? Try Before You Commit.</h3>
-        <p>Come train, no strings attached. You'll know in 60 minutes if this is exactly what you've been missing.</p>
-        <a href="https://wa.me/971585922694?text=Hi%20Antoine,%20I%20want%20to%20book%20a%20free%20trial%20session" class="trial-cta-btn" onclick="trackEvent('TrialBooked', {button_text: 'Book your free trial session', value: '0', currency: 'AED'}); fbq('track', 'Lead', {content_name: 'Trial Session', value: 0, currency: 'AED'}); fbq('trackCustom', 'TrialBooked', {content_name: 'Trial Session', value: 0, currency: 'AED'});">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+      <strong>Try it for 7 days first.</strong> Start your trial, see how it works, and if it's not for you, no hard feelings. But if you're serious about getting results, this is how we do it.
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const basePlans = [
+        { months: 3, priceAED: 3399 },
+        { months: 6, priceAED: 6199 },
+        { months: 12, priceAED: 9600 }
+      ];
+
+      const currencyConfig = {
+        AED: { symbol: 'AED', rate: 1 },
+        AUD: { symbol: 'AUD', rate: 0.41 },
+        EUR: { symbol: 'EUR', rate: 0.25 }
+      };
+
+      const currencySelect = document.getElementById('currencySelect');
+      const planCards = document.querySelectorAll('.pricing-card[data-plan-months]');
+      const planSavingsAED = {
+        6: 600,
+        12: 4000
+      };
+      function formatNumber(value) {
+        return Math.round(value).toLocaleString('en-US');
+      }
+
+      function calculateBaseMonthlyAED() {
+        const basePlan = basePlans.find(item => item.months === 3);
+        return basePlan ? basePlan.priceAED / basePlan.months : 0;
+      }
+
+      function updateCurrency(code) {
+        const config = currencyConfig[code] || currencyConfig.AED;
+        const baseMonthlyAED = calculateBaseMonthlyAED();
+        planCards.forEach(card => {
+          const months = parseInt(card.dataset.planMonths, 10);
+          const plan = basePlans.find(item => item.months === months);
+          if (!plan) return;
+          const total = plan.priceAED * config.rate;
+          const monthly = total / months;
+          const totalEl = card.querySelector('[data-plan-total]');
+          const monthlyEl = card.querySelector('[data-plan-monthly]');
+          const savingEl = card.querySelector('[data-plan-saving]');
+          let savingsText = '';
+          let savingsAED = planSavingsAED[months] || parseFloat(card.dataset.saveAed || '0');
+          
+          if ((!Number.isFinite(savingsAED) || savingsAED <= 0) && baseMonthlyAED) {
+            const expectedAED = baseMonthlyAED * months;
+            savingsAED = expectedAED - plan.priceAED;
+          }
+          
+          if (savingsAED > 0 && months > 3) {
+            const savingsConverted = savingsAED * config.rate;
+            const savingsRounded = Math.ceil(savingsConverted / 100) * 100;
+            savingsText = `Save ${formatNumber(savingsRounded)} ${config.symbol}`;
+          }
+          if (totalEl) {
+            totalEl.textContent = `${formatNumber(total)} ${config.symbol}`;
+          }
+          if (monthlyEl) {
+            monthlyEl.textContent = `(${formatNumber(Math.ceil(monthly))} ${config.symbol}/month)`;
+          }
+          if (savingEl) {
+            if (savingsText) {
+              savingEl.textContent = savingsText;
+              savingEl.style.display = 'flex';
+            } else {
+              savingEl.textContent = '';
+              savingEl.style.display = 'none';
+            }
+          }
+        });
+      }
+
+      currencySelect.addEventListener('change', (event) => {
+        updateCurrency(event.target.value);
+      });
+
+      updateCurrency(currencySelect.value);
+    });
+  </script>
+</section>
+
+
+<!-- How to Get Started Section -->
+<section style="background: #000000; padding: 80px 20px;">
+  <div style="max-width: 1200px; margin: 0 auto;">
+    <h2 style="text-align: center; margin-bottom: 80px; color: #fff; text-transform: uppercase; letter-spacing: 2px; font-size: clamp(32px, 5vw, 48px);">How to Get Started</h2>
+    
+    <div class="steps-container" style="display: grid; grid-template-columns: 1fr auto 1fr auto 1fr; gap: 30px; align-items: start; margin-bottom: 60px;">
+      <!-- Step 1 -->
+      <div style="text-align: center;">
+        <div style="width: 90px; height: 90px; background: transparent; border: 3px solid #ff6413; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 25px;">
+          <svg width="50" height="50" viewBox="0 0 24 24" fill="none" stroke="#ff6413" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+            <line x1="16" y1="2" x2="16" y2="6"></line>
+            <line x1="8" y1="2" x2="8" y2="6"></line>
+            <line x1="3" y1="10" x2="21" y2="10"></line>
           </svg>
-          Book your free trial session
-        </a>
+        </div>
+        <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 15px; color: #fff; text-transform: uppercase; letter-spacing: 1px; min-height: 45px; display: flex; align-items: center; justify-content: center;">Book a Free Discovery Call</h3>
+        <p style="font-size: 16px; color: rgba(255,255,255,0.85); line-height: 1.6; margin: 0; font-weight: 400;">Share your goals and ask questions via a short call, to see if we're the right fit</p>
+      </div>
+      
+      <!-- Arrow 1 -->
+      <div class="step-arrow" style="display: flex; align-items: center; justify-content: center; width: 60px; padding-top: 45px;">
+        <svg width="60" height="30" viewBox="0 0 60 30" style="overflow: visible;">
+          <defs>
+            <marker id="arrowhead1" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+              <polygon points="0 0, 10 3, 0 6" fill="#ff6413" />
+            </marker>
+          </defs>
+          <line x1="0" y1="15" x2="55" y2="15" stroke="#ff6413" stroke-width="2" stroke-dasharray="5,5" marker-end="url(#arrowhead1)" />
+        </svg>
+      </div>
+      
+      <!-- Step 2 -->
+      <div style="text-align: center;">
+        <div style="width: 90px; height: 90px; background: transparent; border: 3px solid #ff6413; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 25px;">
+          <svg width="50" height="50" viewBox="0 0 24 24" fill="none" stroke="#ff6413" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M23 7l-7 5 7 5V7z"></path>
+            <rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect>
+          </svg>
+        </div>
+        <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 15px; color: #fff; text-transform: uppercase; letter-spacing: 1px; min-height: 45px; display: flex; align-items: center; justify-content: center;">Initial Consultation Call</h3>
+        <p style="font-size: 16px; color: rgba(255,255,255,0.85); line-height: 1.6; margin: 0; font-weight: 400;">We'll connect via video to understand where you are, what you're aiming for, and if we're the right fit to work together.</p>
+      </div>
+      
+      <!-- Arrow 2 -->
+      <div class="step-arrow" style="display: flex; align-items: center; justify-content: center; width: 60px; padding-top: 45px;">
+        <svg width="60" height="30" viewBox="0 0 60 30" style="overflow: visible;">
+          <defs>
+            <marker id="arrowhead2" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+              <polygon points="0 0, 10 3, 0 6" fill="#ff6413" />
+            </marker>
+          </defs>
+          <line x1="0" y1="15" x2="55" y2="15" stroke="#ff6413" stroke-width="2" stroke-dasharray="5,5" marker-end="url(#arrowhead2)" />
+        </svg>
+      </div>
+      
+      <!-- Step 3 -->
+      <div style="text-align: center;">
+        <div style="width: 90px; height: 90px; background: transparent; border: 3px solid #ff6413; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 25px;">
+          <svg width="50" height="50" viewBox="0 0 24 24" fill="none" stroke="#ff6413" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polyline points="12 6 12 12 16 14"></polyline>
+          </svg>
+        </div>
+        <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 15px; color: #fff; text-transform: uppercase; letter-spacing: 1px; min-height: 45px; display: flex; align-items: center; justify-content: center;">Your Coaching Journey Begins</h3>
+        <p style="font-size: 16px; color: rgba(255,255,255,0.85); line-height: 1.6; margin: 0; font-weight: 400;">Let's get to work. You'll have your custom action plan and I'll be right there with you every step of the way.</p>
+      </div>
+    </div>
+    
+    <p style="text-align: center; font-size: 17px; color: rgba(255,255,255,0.9); margin-bottom: 35px; font-weight: 400;">To learn if REACH coaching is right for you, you can book a free discovery call below</p>
+    
+    <div style="text-align: center;">
+      <a href="https://wa.me/971585922694?text=Hi%20Antoine,%20I'd%20like%20to%20book%20a%20free%20discovery%20call" class="btn" style="display: inline-block; background: #ff6413; color: #fff; padding: 16px 40px; font-size: 17px; font-weight: 700; text-decoration: none; border-radius: 50px; transition: all 0.3s; border: none; cursor: pointer; text-transform: capitalize; font-family: 'Inter', sans-serif;" onmouseover="this.style.background='#e55510'; this.style.transform='translateY(-2px)'" onmouseout="this.style.background='#ff6413'; this.style.transform='translateY(0)'" onclick="trackEvent('cta_click', {button_location: 'how_to_start', button_text: 'Book a Free Call'}); fbq('track', 'Contact');">Book a Free Call</a>
+    </div>
+  </div>
+</section>
+
+<style>
+/* Responsive pour How to Get Started */
+@media (max-width: 768px) {
+  .steps-container {
+    grid-template-columns: 1fr !important;
+    gap: 40px !important;
+  }
+  
+  .step-arrow {
+    display: none !important;
+  }
+}
+</style>
+
+
+<!-- Client Stories Carousel Section -->
+<section style="background: #fff; padding: 60px 20px;">
+  <div style="max-width: 1200px; margin: 0 auto;">
+    <h2 style="text-align: center; margin-bottom: 20px; font-size: clamp(32px, 5vw, 48px); font-weight: 800;">Client Stories</h2>
+    <p style="text-align: center; max-width: 700px; margin: 0 auto 50px; font-size: 18px; color: #666;">Real people. Real transformations. Real results.</p>
+    
+    <div class="client-scroll-container">
+      <div class="client-scroll-track" id="clientStoriesTrack">
+        
+        <div class="client-story-card">
+          <div class="client-story-image">
+            <img src="01-IMAGES/Client_Stories/aisha.webp" alt="Aisha avant/après" loading="lazy">
+          </div>
+          <div class="client-story-content">
+            <h3 class="client-story-name">Aisha</h3>
+            <div class="client-story-badges">
+              <div class="client-badge">-7kg</div>
+              <div class="client-badge">5 months</div>
+              <div class="client-badge">Melbourne</div>
+            </div>
+            <p class="client-story-quote">"I went from size 42 to a 36, I'm buzzing, had to change my entire wardrobe!"</p>
+          </div>
+        </div>
+        
+        <div class="client-story-card">
+          <div class="client-story-image">
+            <img src="01-IMAGES/Client_Stories/daniel.webp" alt="Daniel avant/après" loading="lazy">
+          </div>
+          <div class="client-story-content">
+            <h3 class="client-story-name">Daniel</h3>
+            <div class="client-story-badges">
+              <div class="client-badge">-11kg</div>
+              <div class="client-badge">4 months</div>
+              <div class="client-badge">Perth</div>
+            </div>
+            <p class="client-story-quote">"Been through 3 coaches before Antoine. Finally found someone who gets it. I've put on solid muscle, my lifts have gone through the roof, and I actually look forward to our sessions. Legend."</p>
+          </div>
+        </div>
+        
+        <div class="client-story-card">
+          <div class="client-story-image">
+            <img src="01-IMAGES/Client_Stories/antoine.webp" alt="Antoine transformation" loading="lazy">
+          </div>
+          <div class="client-story-content">
+            <h3 class="client-story-name">Antoine</h3>
+            <div class="client-story-badges">
+              <div class="client-badge">-26kg</div>
+              <div class="client-badge">11 months</div>
+              <div class="client-badge">Dubai</div>
+            </div>
+            <p class="client-story-quote">"Your one &amp; only coach. I couldn't help you properly if I hadn't gone through a transformation myself and understood what it requires. This is my latest transformation for a photoshoot."</p>
+          </div>
+        </div>
+        
+        <div class="client-story-card">
+          <div class="client-story-image">
+            <img src="01-IMAGES/Client_Stories/liam.webp" alt="Liam transformation" loading="lazy">
+          </div>
+          <div class="client-story-content">
+            <h3 class="client-story-name">Liam</h3>
+            <div class="client-story-badges">
+              <div class="client-badge">-6kg</div>
+              <div class="client-badge">3 months</div>
+              <div class="client-badge">Sydney</div>
+            </div>
+            <p class="client-story-quote">"Training with Antoine for 3 months now and it's been unreal. Leaner, stronger, more focused than ever. Excited to see where this journey takes me!"</p>
+          </div>
+        </div>
+        
+        <div class="client-story-card">
+          <div class="client-story-image">
+            <img src="01-IMAGES/Client_Stories/sarah.webp" alt="Sarah transformation" loading="lazy">
+          </div>
+          <div class="client-story-content">
+            <h3 class="client-story-name">Sarah</h3>
+            <div class="client-story-badges">
+              <div class="client-badge">+3kg</div>
+              <div class="client-badge">6 months</div>
+              <div class="client-badge">Dubai</div>
+            </div>
+            <p class="client-story-quote">"Had a goal to do a photoshoot forever but I'd always pushed it out, not feeling ready physically. Antoine showed up with kindness and compassion every step of the way. He cares so much."</p>
+          </div>
+        </div>
+        
+        <div class="client-story-card">
+          <div class="client-story-image">
+            <img src="01-IMAGES/Client_Stories/samer.webp" alt="Samer transformation" loading="lazy">
+          </div>
+          <div class="client-story-content">
+            <h3 class="client-story-name">Samer</h3>
+            <div class="client-story-badges">
+              <div class="client-badge">-14kg</div>
+              <div class="client-badge">12 months</div>
+              <div class="client-badge">Dubai</div>
+            </div>
+            <p class="client-story-quote">"We've been training more than a year together and what a journey it's been. Antoine is more than a coach—he becomes your best supporter. I've changed physically and mentally for the better."</p>
+          </div>
+        </div>
+        
+        <div class="client-story-card">
+          <div class="client-story-image">
+            <img src="01-IMAGES/Client_Stories/david.webp" alt="David transformation" loading="lazy">
+          </div>
+          <div class="client-story-content">
+            <h3 class="client-story-name">David</h3>
+            <div class="client-story-badges">
+              <div class="client-badge">-13kg</div>
+              <div class="client-badge">7 months</div>
+              <div class="client-badge">London</div>
+            </div>
+            <p class="client-story-quote">"Finally got rid of the beer belly I'd been carrying for years. Feel younger, stronger, and so much better mentally. Life-changing honestly."</p>
+          </div>
+        </div>
+        
+        <div class="client-story-card">
+          <div class="client-story-image">
+            <img src="01-IMAGES/Client_Stories/hakim.webp" alt="Hakim transformation" loading="lazy">
+          </div>
+          <div class="client-story-content">
+            <h3 class="client-story-name">Hakim</h3>
+            <div class="client-story-badges">
+              <div class="client-badge">+4kg muscle</div>
+              <div class="client-badge">13 months</div>
+              <div class="client-badge">France</div>
+            </div>
+            <p class="client-story-quote">"13 months together, gained 4kg of solid muscle. Never thought my back could look like this! Merci! We keep working."</p>
+          </div>
+        </div>
+        
+        <div class="client-story-card">
+          <div class="client-story-image">
+            <img src="01-IMAGES/Client_Stories/jess.webp" alt="Jess transformation" loading="lazy">
+          </div>
+          <div class="client-story-content">
+            <h3 class="client-story-name">Jess</h3>
+            <div class="client-story-badges">
+              <div class="client-badge">-8kg</div>
+              <div class="client-badge">6 months</div>
+              <div class="client-badge">South Africa</div>
+            </div>
+            <p class="client-story-quote">"Down 8kg and honestly feel like myself again. I'm stronger, happier, and finally have the energy I was missing. Thank you Antoine!"</p>
+          </div>
+        </div>
+        
+        <!-- Duplicates for seamless loop -->
+        <div class="client-story-card">
+          <div class="client-story-image">
+            <img src="01-IMAGES/Client_Stories/aisha.webp" alt="Aisha avant/après" loading="lazy">
+          </div>
+          <div class="client-story-content">
+            <h3 class="client-story-name">Aisha</h3>
+            <div class="client-story-badges">
+              <div class="client-badge">-7kg</div>
+              <div class="client-badge">5 months</div>
+              <div class="client-badge">Melbourne</div>
+            </div>
+            <p class="client-story-quote">"I went from size 42 to a 36, I'm buzzing, had to change my entire wardrobe!"</p>
+          </div>
+        </div>
+        
+        <div class="client-story-card">
+          <div class="client-story-image">
+            <img src="01-IMAGES/Client_Stories/daniel.webp" alt="Daniel avant/après" loading="lazy">
+          </div>
+          <div class="client-story-content">
+            <h3 class="client-story-name">Daniel</h3>
+            <div class="client-story-badges">
+              <div class="client-badge">-11kg</div>
+              <div class="client-badge">4 months</div>
+              <div class="client-badge">Perth</div>
+            </div>
+            <p class="client-story-quote">"Been through 3 coaches before Antoine. Finally found someone who gets it. I've put on solid muscle, my lifts have gone through the roof, and I actually look forward to our sessions. Legend."</p>
+          </div>
+        </div>
+        
+        <div class="client-story-card">
+          <div class="client-story-image">
+            <img src="01-IMAGES/Client_Stories/antoine.webp" alt="Antoine transformation" loading="lazy">
+          </div>
+          <div class="client-story-content">
+            <h3 class="client-story-name">Antoine</h3>
+            <div class="client-story-badges">
+              <div class="client-badge">-26kg</div>
+              <div class="client-badge">11 months</div>
+              <div class="client-badge">Dubai</div>
+            </div>
+            <p class="client-story-quote">"Your one &amp; only coach. I couldn't help you properly if I hadn't gone through a transformation myself and understood what it requires. This is my latest transformation for a photoshoot."</p>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </section>
 
+<style>
+
+<style>
+
+  <style>
+/* Styles UNIQUES pour le carousel Client Stories - OPTIMISÉS */
+.client-scroll-container {
+  overflow: hidden;
+  width: 100%;
+  position: relative;
+}
+
+.client-scroll-track {
+  display: flex;
+  gap: 30px; /* Réduit de 40px à 30px */
+  animation: clientScroll 30s linear infinite;
+  width: fit-content;
+}
+
+.client-scroll-track:hover {
+  animation-play-state: paused;
+}
+
+@keyframes clientScroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.client-story-card {
+  background: #fff;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+  width: 280px; /* Réduit de 350px à 280px */
+  flex-shrink: 0;
+}
+
+.client-story-image {
+  aspect-ratio: 3/4;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+  height: 280px; /* Hauteur fixe réduite */
+}
+
+.client-story-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  transform: scale(1.1);
+}
+
+/* Enlever tous les backgrounds colorés */
+.client-story-card:nth-child(3n+2) .client-story-image,
+.client-story-card:nth-child(3n+11) .client-story-image,
+.client-story-card:nth-child(3n+3) .client-story-image,
+.client-story-card:nth-child(3n+12) .client-story-image,
+.client-story-card:nth-child(4) .client-story-image,
+.client-story-card:nth-child(13) .client-story-image,
+.client-story-card:nth-child(5) .client-story-image,
+.client-story-card:nth-child(14) .client-story-image,
+.client-story-card:nth-child(6) .client-story-image,
+.client-story-card:nth-child(15) .client-story-image {
+  background: transparent;
+}
+
+.client-story-content {
+  padding: 16px 20px; /* Réduit de 20px 25px à 16px 20px */
+}
+
+.client-story-name {
+  font-size: 20px; /* Réduit de 24px à 20px */
+  font-weight: 700;
+  margin-bottom: 10px; /* Réduit de 15px à 10px */
+  color: #000;
+}
+
+.client-story-badges {
+  display: flex;
+  gap: 6px; /* Réduit de 8px à 6px */
+  margin-bottom: 12px; /* Réduit de 18px à 12px */
+  flex-wrap: wrap;
+}
+
+.client-badge {
+  background: #ff6413;
+  color: #fff;
+  padding: 4px 10px; /* Réduit de 6px 14px à 4px 10px */
+  border-radius: 20px; /* Réduit de 25px à 20px */
+  font-size: 11px; /* Réduit de 13px à 11px */
+  font-weight: 700;
+}
+
+.client-story-quote {
+  font-size: 13px; /* Réduit de 16px à 13px */
+  color: #444;
+  line-height: 1.5; /* Réduit de 1.6 à 1.5 */
+  margin: 0;
+  font-style: italic;
+}
+
+@media (max-width: 768px) {
+  .client-story-card {
+    width: 260px; /* Réduit de 300px à 260px */
+  }
+  
+  .client-story-image {
+    height: 260px;
+  }
+  
+  .client-scroll-track {
+    gap: 20px;
+  }
+}
+</style>
+
 <!-- Final CTA -->
 <section>
   <div class="container">
-    <h2 style="text-align: center;">Forget everything you've tried until&nbsp;now.</h2>
-    <p style="text-align: center; max-width: 700px; margin: 0 auto 20px;">If you're here, it's because it didn't work. The apps, the programs, the good&nbsp;intentions.</p>
-    <p style="text-align: center; max-width: 700px; margin: 0 auto 20px;">Now, we start over. But we do it&nbsp;differently.</p>
-    <p style="text-align: center; max-width: 700px; margin: 0 auto 20px;">This time, you've got someone with you. Someone who shows you what to do. Who pushes when it's hard. And makes sure you don't&nbsp;quit.</p>
-    <p style="text-align: center; font-weight: 600; font-size: 20px; margin: 30px auto;">No fluff. No magic. Just work, done right.</p>
-    <p style="text-align: center; max-width: 700px; margin: 0 auto 30px; font-size: 20px;">This time, we do it&nbsp;together.</p>
+    <h2 style="text-align: center;">Forget every fitness app you've downloaded.</h2>
+    <p style="text-align: center; max-width: 700px; margin: 0 auto 20px;">You know how to train. That's not the problem.</p>
+    <p style="text-align: center; max-width: 700px; margin: 0 auto 20px;">The problem? No one's there to make sure you actually do it.</p>
+    <p style="text-align: center; max-width: 700px; margin: 0 auto 20px;">This time, someone's checking in. Someone's adjusting your plan. Someone who makes sure you don't disappear.</p>
+    <p style="text-align: center; font-weight: 600; font-size: 20px; margin: 30px auto;">No magic. No shortcuts. Just structure and accountability.</p>
     <div style="text-align: center;">
-      <a href="https://wa.me/971585922694?text=Hi%20Antoine,%20I'm%20interested%20in%20your%20coaching%20program%20at%20NOGS" class="btn" onclick="trackEvent('cta_click', {button_location: 'final_cta', button_text: 'Message me on WhatsApp'}); fbq('track', 'Contact');">Message me on WhatsApp</a>
+      <a href="https://wa.me/971585922694?text=Hi%20Antoine,%20I'm%20interested%20in%20your%20coaching%20program%20at%20NOGS" class="btn" onclick="trackEvent('cta_click', {button_location: 'final_cta', button_text: 'Start Your 7-Day Trial'}); fbq('track', 'Contact');">Start Your 7-Day Trial</a>
     </div>
   </div>
 </section>
@@ -2172,41 +2735,41 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <div class="faq-container">
       <div class="faq-item">
         <div class="faq-question">
-          <h3>Where do sessions happen?</h3>
+          <h3>What app do you use?</h3>
           <span class="faq-toggle">+</span>
         </div>
         <div class="faq-answer">
-          <p>NOGS, Al Quoz. It's a performance gym with everything we need. If you can't train there, this won't work.</p>
+          <p>Everything is managed through a simple, all-in-one coaching app. You'll get your login details after signing up. Training, nutrition, progress tracking—it's all there.</p>
         </div>
       </div>
       
       <div class="faq-item">
         <div class="faq-question">
-          <h3>Do I need a NOGS membership?</h3>
+          <h3>Can I train at any gym?</h3>
           <span class="faq-toggle">+</span>
         </div>
         <div class="faq-answer">
-          <p>Yes. The coaching packages don't include the gym membership. You'll need to sign up separately with NOGS.</p>
+          <p>Absolutely. Your program is built based on the equipment you have access to. Home gym, commercial gym, hotel gym—doesn't matter. We make it work.</p>
         </div>
       </div>
       
       <div class="faq-item">
         <div class="faq-question">
-          <h3>How many sessions per week?</h3>
+          <h3>How do check-ins work?</h3>
           <span class="faq-toggle">+</span>
         </div>
         <div class="faq-answer">
-          <p>Most clients do 2-3 sessions per week. We'll figure out what works for your schedule and goals.</p>
+          <p>Every week, you submit a check-in through the app. I review it, give feedback, and adjust your program if needed. Simple, structured, consistent.</p>
         </div>
       </div>
       
       <div class="faq-item">
         <div class="faq-question">
-          <h3>What if I'm a complete beginner?</h3>
+          <h3>What if I need to skip a week?</h3>
           <span class="faq-toggle">+</span>
         </div>
         <div class="faq-answer">
-          <p>Perfect. That's exactly when face-to-face coaching matters most. We start where you are. No judgment.</p>
+          <p>Life happens. Just let me know. We adjust and keep moving. The goal is consistency over time, not perfection every single week.</p>
         </div>
       </div>
       
@@ -2222,11 +2785,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       
       <div class="faq-item">
         <div class="faq-question">
-          <h3>What if I can't make a session?</h3>
+          <h3>How fast can I contact you?</h3>
           <span class="faq-toggle">+</span>
         </div>
         <div class="faq-answer">
-          <p>Give me 24 hours notice and we'll reschedule. Life happens. I get it.</p>
+          <p>Message me on WhatsApp. I usually reply within a few hours. This isn't a faceless service—I'm here to support you.</p>
         </div>
       </div>
     </div>
@@ -2235,8 +2798,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
 <!-- CTA Section -->
 <section class="cta-section">
-  <h2>Not sure which is right for you?</h2>
-  <p>Book a free consultation and let's discuss your goals, schedule, and find the perfect coaching fit.</p>
+  <h2>Ready to stop starting over?</h2>
+  <p>Start your 7-day trial and see what it's like to have real structure, real accountability, and a real coach in your corner.</p>
   <a href="https://wa.me/971585922694?text=Hi%20Antoine,%20I%20want%20to%20book%20a%20free%20consultation" class="btn-secondary" onclick="trackEvent('consultation_click', {button_location: 'bottom_cta', button_text: 'Book your free trial session'}); fbq('track', 'Contact');">Book your free trial session</a>
 </section>
 
@@ -2253,7 +2816,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 </a>
 
 <footer>
-  &copy; 2025 REACH by Antoine | 1-on-1 Coaching at NOGS, Al Quoz | Your Shape Culture Specialist
+  &copy; 2025 REACH by Antoine | On line coaching | Your Shape Culture Specialist
   <div style="margin-top: 12px;">
     <a href="https://reach.fitness" rel="noopener" style="color: #888; text-decoration: none; font-size: 14px;">Visit REACH.Fitness &rarr;</a>
   </div>
