@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://1to1.reach.fitness/sitemap.xml
+
