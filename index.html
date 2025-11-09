@@ -299,11 +299,10 @@
   <style>
     .money-back-badge {
       position: fixed;
-      left: 28px;
-      bottom: 140px;
-      width: 110px;
+      right: 28px;
+      bottom: 110px;
+      width: 100px;
       z-index: 101;
-      transition: transform 0.3s ease;
       filter: drop-shadow(0 10px 25px rgba(0, 0, 0, 0.4));
       pointer-events: none;
     }
@@ -315,31 +314,32 @@
     }
 
     .whatsapp-float {
-      width: 52px;
-      height: 52px;
-      bottom: 24px;
-      right: 24px;
+      width: 48px;
+      height: 48px;
+      bottom: 22px;
+      right: 22px;
     }
 
     @media (max-width: 768px) {
       .money-back-badge {
-        width: 80px;
-        left: 16px;
-        bottom: 150px;
+        width: 72px;
+        bottom: 100px;
+        right: 18px;
       }
 
       .whatsapp-float {
-        width: 46px;
-        height: 46px;
-        bottom: 18px;
-        right: 18px;
+        width: 42px;
+        height: 42px;
+        bottom: 16px;
+        right: 16px;
       }
     }
 
     @media (max-width: 480px) {
       .money-back-badge {
-        width: 70px;
-        bottom: 170px;
+        width: 64px;
+        bottom: 88px;
+        right: 16px;
       }
     }
   </style>
