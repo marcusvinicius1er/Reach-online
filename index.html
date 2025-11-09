@@ -296,6 +296,53 @@
   </style>
   <link rel="preload" href="style.css" as="style" onload="this.rel='stylesheet'">
   <noscript><link rel="stylesheet" href="style.css"></noscript>
+  <style>
+    .money-back-badge {
+      position: fixed;
+      left: 28px;
+      bottom: 140px;
+      width: 110px;
+      z-index: 101;
+      transition: transform 0.3s ease;
+      filter: drop-shadow(0 10px 25px rgba(0, 0, 0, 0.4));
+      pointer-events: none;
+    }
+
+    .money-back-badge img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .whatsapp-float {
+      width: 52px;
+      height: 52px;
+      bottom: 24px;
+      right: 24px;
+    }
+
+    @media (max-width: 768px) {
+      .money-back-badge {
+        width: 80px;
+        left: 16px;
+        bottom: 150px;
+      }
+
+      .whatsapp-float {
+        width: 46px;
+        height: 46px;
+        bottom: 18px;
+        right: 18px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .money-back-badge {
+        width: 70px;
+        bottom: 170px;
+      }
+    }
+  </style>
 
   <!-- Structured Data (JSON-LD) for SEO -->
   <script type="application/ld+json">
