@@ -770,84 +770,204 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
 </section>
 
-<section style="background: #000000; padding: 60px 20px; color: #fff;" id="whySection">
-  <div style="max-width: 1200px; margin: 0 auto;">
-    <!-- Accroche principale -->
-    <div style="text-align: center; margin-bottom: 80px;">
-      <h2 style="font-size: clamp(36px, 5vw, 56px); font-weight: 700; margin-bottom: 30px; color: #fff;">Here's what Changes When You Work With Me.</h2>
+<section class="timeline-section" id="whySection">
+  <div class="container container-wide">
+    <h2 class="timeline-title">Here's What Changes When You Work With Me.</h2>
+    <p class="timeline-subtitle">Because I'm invested in your success. From day one to the finish line.</p>
 
-      <p style="max-width: 800px; margin: 0 auto; font-size: 20px; color: #ccc; line-height: 1.6;">Because I'm invested in your success. From day one to the finish line.</p>
-    </div>
+    <div class="timeline-content-wrapper">
+      <div class="timeline-line"></div>
+      <div class="timeline-progress"></div>
+      <div class="timeline-number timeline-number--top" data-number="1">1</div>
+      <div class="timeline-number timeline-number--middle" data-number="2">2</div>
+      <div class="timeline-number timeline-number--bottom" data-number="3">3</div>
 
-    <div class="timeline-container" style="position: relative; padding-top: 60px; padding-bottom: 60px;">
-      <!-- Ligne grise de base qui va du haut au bas -->
-      <div class="timeline-line-base" style="position: absolute; left: 50%; transform: translateX(-50%); width: 4px; top: 0; bottom: 0; background: #333; z-index: 0;"></div>
-
-      <!-- Ligne orange qui s'anime -->
-      <div id="progressLine" class="timeline-line-progress" style="position: absolute; left: 50%; transform: translateX(-50%); width: 4px; top: 0; height: 0%; background: #ff6413; z-index: 1; transition: height 0.1s linear;"></div>
-
-      <!-- Item 1 -->
-      <div class="timeline-item" style="display: grid; grid-template-columns: 1fr 80px 1fr; gap: 60px; align-items: center; margin-bottom: 120px; position: relative;">
-        <div class="timeline-text text-right" style="text-align: right;">
-          <h3 style="font-size: clamp(24px, 3vw, 32px); font-weight: 700; margin-bottom: 15px; color: #ff6413;">You'll get a plan that adapts to YOUR life.</h3>
-          <div class="what-you-get">
-            <p class="what-you-get-title">What this means for you:</p>
-            <ul class="what-you-get-list">
-              <li>You get a training plan built for YOUR life. Your gym, your schedule, your equipment. It works around you, for you.</li>
-            </ul>
+      <div class="timeline-row" data-timeline-section="1">
+        <div class="timeline-copy">
+          <div class="timeline-chip">✓ Personalized Coaching</div>
+          <h3 class="timeline-heading">You'll get a plan that adapts to YOUR life.</h3>
+          <div class="timeline-card">
+            <p>
+              <strong>✓ What this means for you:</strong><br>
+              You get a training plan built for YOUR life. Your gym, your schedule, your equipment. It works around you, for you.
+            </p>
           </div>
         </div>
-        <div class="timeline-badge" style="display: flex; justify-content: center; z-index: 2;">
-          <div style="width: 70px; height: 70px; background: #ff6413; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 36px; font-weight: 700; color: #fff; border: 6px solid #000;">1</div>
-        </div>
-        <div class="timeline-image" style="background: #1a1a1a; aspect-ratio: 16/10; border-radius: 16px; overflow: hidden;">
-          <img src="01-IMAGES/stop_thinking.webp" alt="Personal training session" style="width: 100%; height: 100%; object-fit: cover;" loading="lazy">
+        <div class="timeline-media">
+          <img src="01-IMAGES/stop_thinking.webp" alt="Personalized coaching app preview" loading="lazy">
         </div>
       </div>
 
-      <!-- Item 2 -->
-      <div class="timeline-item" style="display: grid; grid-template-columns: 1fr 80px 1fr; gap: 60px; align-items: center; margin-bottom: 120px; position: relative;">
-        <div class="timeline-text text-right" style="text-align: right;">
-          <h3 style="font-size: clamp(24px, 3vw, 32px); font-weight: 700; margin-bottom: 15px; color: #ff6413;">Every week, we check in. You stay on track. Simple as that.<br></h3>
-          <div class="what-you-get">
-            <p class="what-you-get-title">What this means for you:</p>
-            <ul class="what-you-get-list">
-              <li>Every week, I review your check-in. We see what's working, what needs adjusting. That's how the plan stays adapted to what's actually happening in your life.</li>
-            </ul>
+      <div class="timeline-row timeline-row--reverse" data-timeline-section="2">
+        <div class="timeline-copy">
+          <div class="timeline-chip">✓ Consistent Accountability</div>
+          <h3 class="timeline-heading">Every week, we check in. You stay on track. Simple as that.</h3>
+          <div class="timeline-card">
+            <p>
+              <strong>✓ What this means for you:</strong><br>
+              Every week, I review your check-in. We see what's working, what needs adjusting. That's how the plan stays adapted to what's actually happening in your life.
+            </p>
           </div>
         </div>
-        <div class="timeline-badge" style="display: flex; justify-content: center; z-index: 2;">
-          <div style="width: 70px; height: 70px; background: #ff6413; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 36px; font-weight: 700; color: #fff; border: 6px solid #000;">2</div>
-        </div>
-        <div class="timeline-image" style="background: #1a1a1a; aspect-ratio: 16/10; border-radius: 16px; overflow: hidden;">
-          <img src="01-IMAGES/progress_tracking.webp" alt="Progress tracking app" style="width: 100%; height: 100%; object-fit: cover;" loading="lazy">
+        <div class="timeline-media">
+          <img src="01-IMAGES/progress_tracking.webp" alt="Weekly coaching check-in" loading="lazy">
         </div>
       </div>
 
-      <!-- Item 3 -->
-      <div class="timeline-item" style="display: grid; grid-template-columns: 1fr 80px 1fr; gap: 50px; align-items: center; position: relative;">
-        <div class="timeline-text text-right" style="text-align: right;">
-          <h3 style="font-size: clamp(24px, 3vw, 32px); font-weight: 700; margin-bottom: 15px; color: #ff6413;">You'll have a coach who stays invested from day one.</h3>
-          <div class="what-you-get">
-            <p class="what-you-get-title">What this means for you:</p>
-            <ul class="what-you-get-list">
-              <li>And it doesn't stop there. This is OUR journey from day one. You need something? Message me. This isn't just business. I'm invested in where you're going. We celebrate wins together !</li>
-            </ul>
+      <div class="timeline-row" data-timeline-section="3">
+        <div class="timeline-copy">
+          <div class="timeline-chip">✓ Long-Term Support</div>
+          <h3 class="timeline-heading">You'll have a coach who stays invested from day one.</h3>
+          <div class="timeline-card">
+            <p>
+              <strong>✓ What this means for you:</strong><br>
+              And it doesn't stop there. This is OUR journey from day one. You need something? Message me. This isn't just business. I'm invested in where you're going. We celebrate wins together!
+            </p>
           </div>
         </div>
-        <div class="timeline-badge" style="display: flex; justify-content: center; z-index: 2;">
-          <div style="width: 70px; height: 70px; background: #ff6413; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 36px; font-weight: 700; color: #fff; border: 6px solid #000;">3</div>
-        </div>
-        <div class="timeline-image" style="background: #1a1a1a; aspect-ratio: 16/10; border-radius: 16px; overflow: hidden;">
-          <img src="01-IMAGES/support_continues2.webp" alt="Coaching support via mobile" style="width: 100%; height: 100%; object-fit: cover;" loading="lazy">
+        <div class="timeline-media">
+          <img src="01-IMAGES/support_continues2.webp" alt="Ongoing coaching support" loading="lazy">
         </div>
       </div>
     </div>
 
-    <p style="text-align: center; font-weight: 600; font-size: 20px; margin-top: 50px; color: #fff; max-width: 800px; margin-left: auto; margin-right: auto; line-height: 1.5;">It's not more knowledge you need. It's someone to make sure you use it. And that's exactly what we do, together, every week.</p>
+    <div class="timeline-footer">
+      <p>It's not more knowledge you need. It's someone to make sure you use it. And that's exactly what we do, together, every week.</p>
+    </div>
+
+    <div class="timeline-cta">
+      <h3>Ready?</h3>
+      <p>Let's make this work. Together, from day one.</p>
+      <a href="#pricing" class="timeline-cta-button">Start Together</a>
+    </div>
   </div>
-
 </section>
+
+<section class="how-it-works-section">
+  <div class="container container-wide">
+    <h2 class="how-it-works-title">How It Works</h2>
+    <p class="how-it-works-subtitle">No sales calls. No applications. Just coaching.</p>
+
+    <div class="how-it-works-badge">This is how we start:</div>
+
+    <div class="how-it-works-grid">
+      <div class="how-it-works-card">
+        <div class="how-it-works-icon">
+          <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 11l3 3L22 4"></path>
+            <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"></path>
+          </svg>
+        </div>
+        <h3>Pick Your Plan</h3>
+        <p>Choose 1, 3, or 6 months. All include the same coaching—just pick your commitment level.</p>
+      </div>
+
+      <div class="how-it-works-card">
+        <div class="how-it-works-icon">
+          <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+            <line x1="8" y1="21" x2="16" y2="21"></line>
+            <line x1="12" y1="17" x2="12" y2="21"></line>
+          </svg>
+        </div>
+        <h3>I Build Your Plan</h3>
+        <p>You fill out a quick form. I review your info and build everything custom for you. Give me 48h.</p>
+      </div>
+
+      <div class="how-it-works-card">
+        <div class="how-it-works-icon">
+          <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 11.08V12a10 10 0 11-5.93-9.14"></path>
+            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+          </svg>
+        </div>
+        <h3>You're Ready To Go</h3>
+        <p>You get your login. Your plan is ready. Download the app and let's crush it together.</p>
+      </div>
+    </div>
+
+    <div class="how-it-works-cta">
+      <a href="#pricing" class="how-it-works-button">See Pricing Options</a>
+    </div>
+  </div>
+</section>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const section = document.getElementById('whySection');
+    if (!section) return;
+
+    const content = section.querySelector('.timeline-content-wrapper');
+    const progressEl = section.querySelector('.timeline-progress');
+    const rows = Array.from(section.querySelectorAll('.timeline-row'));
+    const numbers = Array.from(section.querySelectorAll('.timeline-number'));
+
+    if (!content || !progressEl || rows.length === 0) return;
+
+    const getContentTop = () => content.getBoundingClientRect().top + window.scrollY;
+
+    const updateTimeline = () => {
+      const viewportCenter = window.scrollY + window.innerHeight * 0.5;
+      const contentTop = getContentTop();
+      const contentHeight = content.offsetHeight;
+
+      const progressPixels = Math.min(Math.max(viewportCenter - contentTop, 0), contentHeight);
+      progressEl.style.height = `${progressPixels}px`;
+
+      let activeIndex = -1;
+      rows.forEach((row, idx) => {
+        const rowTop = row.getBoundingClientRect().top + window.scrollY;
+        const trigger = rowTop + row.offsetHeight * 0.25;
+        if (viewportCenter >= trigger) {
+          activeIndex = idx;
+        }
+      });
+
+      if (viewportCenter > contentTop) {
+        activeIndex = Math.max(activeIndex, 0);
+      }
+
+      numbers.forEach((number, idx) => {
+        if (idx <= activeIndex) {
+          number.classList.add('is-active');
+        } else {
+          number.classList.remove('is-active');
+        }
+      });
+
+      if (viewportCenter <= contentTop) {
+        numbers.forEach((number, idx) => {
+          if (idx === 0) {
+            number.classList.add('is-active');
+          } else {
+            number.classList.remove('is-active');
+          }
+        });
+        progressEl.style.height = '0px';
+      }
+
+      if (window.scrollY + window.innerHeight >= contentTop + contentHeight) {
+        numbers.forEach(number => number.classList.add('is-active'));
+        progressEl.style.height = `${contentHeight}px`;
+      }
+    };
+
+    let ticking = false;
+    const onScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          updateTimeline();
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', updateTimeline);
+    updateTimeline();
+  });
+</script>
 
 <section class="pricing-section" id="pricing">
   <div class="container" style="max-width: 1200px;">
@@ -869,7 +989,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     </div>
 
     <div class="pricing-cards-container">
-      <div class="pricing-card" data-plan-months="3" data-save-aed="0">
+      <div class="pricing-card" data-plan-duration="1">
         <h3 class="plan-title">1 Month</h3>
         <div class="price-wrapper">
           <div class="price" data-plan-total></div>
@@ -883,10 +1003,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
           <li>Weekly check-ins</li>
           <li class="feature-whatsapp">WhatsApp support</li>
         </ul>
-        <a href="https://wa.me/971585922694?text=Hi%20Antoine,%20I'm%20ready%20to%20start%20the%203%20month%20online%20coaching" class="plan-button" onclick="trackEvent('package_click', {package_name: '3 Months Online', button_text: 'Subscribe'}); fbq('track', 'InitiateCheckout', {value: 0, currency: 'AED', content_name: '3 Months Online'});">Subscribe</a>
+        <a href="https://wa.me/971585922694?text=Hi%20Antoine,%20I'm%20ready%20to%20start%20the%201%20month%20online%20coaching" class="plan-button" onclick="trackEvent('package_click', {package_name: '1 Month Online', button_text: 'Subscribe'}); fbq('track', 'InitiateCheckout', {value: 0, currency: 'AED', content_name: '1 Month Online'});">Subscribe</a>
       </div>
 
-      <div class="pricing-card" data-plan-months="6" data-save-aed="600">
+      <div class="pricing-card" data-plan-duration="3">
         <div class="most-popular-badge">Most popular</div>
         <h3 class="plan-title">3 Months</h3>
         <div class="price-wrapper">
@@ -901,10 +1021,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
           <li>Weekly check-ins</li>
           <li class="feature-whatsapp">WhatsApp support</li>
         </ul>
-        <a href="https://wa.me/971585922694?text=Hi%20Antoine,%20I'm%20ready%20to%20start%20the%206%20month%20online%20coaching" class="plan-button" onclick="trackEvent('package_click', {package_name: '6 Months Online', button_text: 'Subscribe'}); fbq('track', 'InitiateCheckout', {value: 0, currency: 'AED', content_name: '6 Months Online'});">Subscribe</a>
+        <a href="https://wa.me/971585922694?text=Hi%20Antoine,%20I'm%20ready%20to%20start%20the%203%20month%20online%20coaching" class="plan-button" onclick="trackEvent('package_click', {package_name: '3 Months Online', button_text: 'Subscribe'}); fbq('track', 'InitiateCheckout', {value: 0, currency: 'AED', content_name: '3 Months Online'});">Subscribe</a>
       </div>
 
-      <div class="pricing-card best-value" data-plan-months="12" data-save-aed="4000">
+      <div class="pricing-card best-value" data-plan-duration="6">
         <div class="best-value-badge">Best value</div>
         <h3 class="plan-title">6 Months</h3>
         <div class="price-wrapper">
@@ -919,7 +1039,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
           <li>Weekly check-ins</li>
           <li class="feature-whatsapp">WhatsApp support</li>
         </ul>
-        <a href="https://wa.me/971585922694?text=Hi%20Antoine,%20I'm%20ready%20to%20start%20the%2012%20month%20online%20coaching" class="plan-button" onclick="trackEvent('package_click', {package_name: '12 Months Online', button_text: 'Subscribe'}); fbq('track', 'InitiateCheckout', {value: 0, currency: 'AED', content_name: '12 Months Online'});">Subscribe</a>
+        <a href="https://wa.me/971585922694?text=Hi%20Antoine,%20I'm%20ready%20to%20start%20the%206%20month%20online%20coaching" class="plan-button" onclick="trackEvent('package_click', {package_name: '6 Months Online', button_text: 'Subscribe'}); fbq('track', 'InitiateCheckout', {value: 0, currency: 'AED', content_name: '6 Months Online'});">Subscribe</a>
       </div>
     </div>
 
