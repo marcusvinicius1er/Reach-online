@@ -67,6 +67,8 @@
   .how-it-works-button{width:100%}
 }
 
+.location-box{margin:50px auto 36px;max-width:780px}
+
 .guarantee-section{background:#ffffff;padding:50px 20px}
 .guarantee-card{border:2px solid #ff6413;border-radius:20px;padding:45px 40px;text-align:center;max-width:900px;margin:0 auto;background:#fff8f2;box-shadow:0 14px 32px rgba(255,100,19,0.08);display:flex;flex-direction:column;gap:18px}
 .guarantee-icon{font-size:42px}
