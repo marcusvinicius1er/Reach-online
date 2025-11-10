@@ -2,3 +2,6 @@
 .vscode/
 
 
+
+# Design source files
+*.psd
