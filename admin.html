@@ -65,16 +65,21 @@
           <table class="admin-table">
             <thead>
               <tr>
-                <th>Client</th>
-                <th>Plan &amp; Price</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>WhatsApp</th>
+                <th>Location</th>
+                <th>Plan</th>
+                <th>Currency</th>
+                <th>Price</th>
+                <th>Goals</th>
                 <th>Status</th>
                 <th>Timeline</th>
-                <th>Notes</th>
                 <th style="min-width:200px;">Actions</th>
               </tr>
             </thead>
             <tbody id="queueBody">
-              <tr class="admin-empty"><td colspan="6">No submissions stored locally.</td></tr>
+              <tr class="admin-empty"><td colspan="11">No submissions stored locally.</td></tr>
             </tbody>
           </table>
         </div>
@@ -234,7 +239,7 @@
       function renderQueue() {
         tableBody.innerHTML = '';
         if (!queue.length) {
-          tableBody.innerHTML = '<tr class="admin-empty"><td colspan="6">No submissions stored locally.</td></tr>';
+          tableBody.innerHTML = '<tr class="admin-empty"><td colspan="11">No submissions stored locally.</td></tr>';
           updateStats();
           return;
         }
@@ -246,40 +251,36 @@
         });
 
         sorted.forEach(record => {
+          const payload = record.payload || {};
           const statusLabel = STATUS_LABELS[record.status] || record.status || 'Unknown';
           const badgeClass = `status-badge ${record.status || 'queued'}`;
-          const goalsPreview = record.payload?.goals ? escapeHtml(record.payload.goals).slice(0, 220) : '';
-          const goalsText = goalsPreview && record.payload.goals.length > 220 ? `${goalsPreview}…` : goalsPreview;
+          const goalsPreview = payload.goals ? escapeHtml(payload.goals).slice(0, 250) : '';
+          const goalsText = goalsPreview && payload.goals.length > 250 ? `${goalsPreview}…` : goalsPreview;
+          const timelineItems = [
+            record.createdAt ? `Created: ${formatDate(record.createdAt)}` : null,
+            record.submittedAt ? `Submitted: ${formatDate(record.submittedAt)}` : null,
+            record.lastAttemptAt ? `Last attempt: ${formatDate(record.lastAttemptAt)}` : null,
+            record.backupEmailAt ? `Backup email: ${formatDate(record.backupEmailAt)}` : null,
+            record.lastError ? `Error: ${escapeHtml(record.lastError)}` : null,
+            record.lastEmailError ? `Email error: ${escapeHtml(record.lastEmailError)}` : null
+          ].filter(Boolean);
 
           const row = document.createElement('tr');
           row.innerHTML = `
-            <td>
-              <strong>${escapeHtml(record.payload?.fullName || '—')}</strong><br>
-              ${record.payload?.email ? `<span class=\"admin-tag\">${escapeHtml(record.payload.email)}</span>` : ''}
-              ${record.payload?.whatsapp ? `<span class=\"admin-tag\">${escapeHtml(record.payload.whatsapp)}</span>` : ''}
-              ${record.payload?.location ? `<div class=\"admin-note\">Location: ${escapeHtml(record.payload.location)}</div>` : ''}
-            </td>
-            <td>
-              ${escapeHtml(record.payload?.planLabel || record.payload?.planValue || '—')}<br>
-              ${record.payload?.currencyCode ? `<span class=\"admin-tag\">${escapeHtml(record.payload.currencyCode)}</span>` : ''}
-              ${record.payload?.priceDisplay ? `<span class=\"admin-tag\">${escapeHtml(record.payload.priceDisplay)}</span>` : ''}
-            </td>
-            <td><span class=\"${badgeClass}\">${escapeHtml(statusLabel)}</span></td>
-            <td>
-              <div class=\"admin-note\">Created: ${formatDate(record.createdAt)}</div>
-              ${record.submittedAt ? `<div class=\"admin-note\">Submitted: ${formatDate(record.submittedAt)}</div>` : ''}
-              ${record.backupEmailAt ? `<div class=\"admin-note\">Backup email: ${formatDate(record.backupEmailAt)}</div>` : ''}
-              ${record.lastAttemptAt ? `<div class=\"admin-note\">Last attempt: ${formatDate(record.lastAttemptAt)}</div>` : ''}
-            </td>
-            <td>
-              ${record.lastError ? `<div class=\"admin-note\">Error: ${escapeHtml(record.lastError)}</div>` : ''}
-              ${record.lastEmailError ? `<div class=\"admin-note\">Email error: ${escapeHtml(record.lastEmailError)}</div>` : ''}
-              ${goalsText ? `<div class=\"admin-note\">Goals: ${goalsText}</div>` : ''}
-            </td>
-            <td class=\"admin-actions\">
-              <button type=\"button\" data-action=\"copy\" data-id=\"${record.id}\">Copy data</button>
-              ${(record.status === 'queued' || record.status === 'backup_failed') ? `<button type=\"button\" data-action=\"resend\" data-id=\"${record.id}\">Resend to Airtable</button>` : ''}
-              ${(record.status !== 'submitted' && record.status !== 'submitted_manual') ? `<button type=\"button\" data-action=\"mark\" data-id=\"${record.id}\">Mark submitted</button>` : ''}
+            <td><strong>${escapeHtml(payload.fullName || '—')}</strong></td>
+            <td>${payload.email ? `<a href="mailto:${escapeHtml(payload.email)}">${escapeHtml(payload.email)}</a>` : '—'}</td>
+            <td>${payload.whatsapp ? `<a href="https://wa.me/${encodeURIComponent(payload.whatsapp.replace(/[^0-9+]/g,''))}" target="_blank" rel="noopener noreferrer">${escapeHtml(payload.whatsapp)}</a>` : '—'}</td>
+            <td>${escapeHtml(payload.location || '—')}</td>
+            <td>${escapeHtml(payload.planLabel || payload.planValue || '—')}</td>
+            <td>${escapeHtml(payload.currencyCode ? `${payload.currencyCode} ${payload.currencySymbol || ''}`.trim() : '—')}</td>
+            <td>${escapeHtml(payload.priceDisplay || '—')}</td>
+            <td>${goalsText || '—'}</td>
+            <td><span class="${badgeClass}">${escapeHtml(statusLabel)}</span></td>
+            <td>${timelineItems.length ? timelineItems.map(item => `<div class="admin-note">${item}</div>`).join('') : '<span class="admin-note">No timeline data</span>'}</td>
+            <td class="admin-actions">
+              <button type="button" data-action="copy" data-id="${record.id}">Copy data</button>
+              ${(record.status === 'queued' || record.status === 'backup_failed') ? `<button type="button" data-action="resend" data-id="${record.id}">Resend to Airtable</button>` : ''}
+              ${(record.status !== 'submitted' && record.status !== 'submitted_manual') ? `<button type="button" data-action="mark" data-id="${record.id}">Mark submitted</button>` : ''}
             </td>
           `;
           tableBody.appendChild(row);
