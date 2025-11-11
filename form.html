@@ -93,13 +93,31 @@
 
   <script>
     (function () {
+      const SECURITY_CONFIG = {
+        localStorageKey: 'reachFormSubmissions',
+        webhookURL: 'https://hooks.airtable.com/workflows/v1/genericWebhook/appDKRjPsZbEVt0iJ/wflE1Sy1QoDzTUpHL/wtr7nw1o8KVBsecw8',
+        retryIntervalMinutes: 5,
+        email: {
+          enabled: false,
+          publicKey: '',
+          serviceId: '',
+          templateId: '',
+          toEmail: ''
+        }
+      };
+
+      const CONTACT_FALLBACK_MESSAGE = 'We saved your application locally and will retry automatically once the connection is restored.';
+
+      const CONTACT_EMAIL_FALLBACK = SECURITY_CONFIG.email.toEmail && !SECURITY_CONFIG.email.toEmail.includes('REPLACE')
+        ? SECURITY_CONFIG.email.toEmail
+        : 'your-email@example.com';
+
       const params = new URLSearchParams(window.location.search);
       const planParam = params.get('plan');
       const planSelect = document.getElementById('selectedPlan');
       const currencySelect = document.getElementById('currency');
       const priceDisplay = document.getElementById('priceDisplay');
       const priceValue = document.getElementById('priceValue');
-      const webhookURL = 'https://hooks.airtable.com/workflows/v1/genericWebhook/appDKRjPsZbEVt0iJ/wflE1Sy1QoDzTUpHL/wtr7nw1o8KVBsecw8';
       const form = document.getElementById('coachingForm');
       const formFields = form.querySelectorAll('input[required], select[required]');
       const submitButton = form.querySelector('.form-submit-button');
@@ -114,6 +132,249 @@
       };
 
       const defaultCurrency = currencySelect?.value || 'AED';
+
+      function checkLocalStorageAvailable() {
+        try {
+          const testKey = '__reach_form_test__';
+          localStorage.setItem(testKey, '1');
+          localStorage.removeItem(testKey);
+          return true;
+        } catch (error) {
+          console.warn('[Reach Form] LocalStorage unavailable:', error);
+          return false;
+        }
+      }
+
+      const localStorageAvailable = checkLocalStorageAvailable();
+      const queueEnabled = localStorageAvailable && Boolean(SECURITY_CONFIG.localStorageKey);
+      let queueCache = queueEnabled ? loadQueueFromStorage() : [];
+      let emailJsInitialized = false;
+
+      if (queueEnabled) {
+        window.addEventListener('storage', event => {
+          if (event.key === SECURITY_CONFIG.localStorageKey) {
+            queueCache = loadQueueFromStorage();
+          }
+        });
+      }
+
+      function loadQueueFromStorage() {
+        try {
+          const raw = localStorage.getItem(SECURITY_CONFIG.localStorageKey);
+          if (!raw) return [];
+          const parsed = JSON.parse(raw);
+          return Array.isArray(parsed) ? parsed : [];
+        } catch (error) {
+          console.error('[Reach Form] Failed to load queue from storage:', error);
+          return [];
+        }
+      }
+
+      function persistQueue() {
+        if (!queueEnabled) return;
+        try {
+          localStorage.setItem(SECURITY_CONFIG.localStorageKey, JSON.stringify(queueCache));
+        } catch (error) {
+          console.error('[Reach Form] Unable to persist queue:', error);
+        }
+      }
+
+      function addRecord(record) {
+        if (!queueEnabled) return record;
+        queueCache.push(record);
+        persistQueue();
+        return record;
+      }
+
+      function getRecord(recordId) {
+        if (!queueEnabled) return null;
+        return queueCache.find(item => item.id === recordId) || null;
+      }
+
+      function updateRecord(recordId, updates) {
+        if (!queueEnabled) return null;
+        const index = queueCache.findIndex(item => item.id === recordId);
+        if (index === -1) return null;
+        queueCache[index] = { ...queueCache[index], ...updates };
+        persistQueue();
+        return queueCache[index];
+      }
+
+      function createRecord(payload) {
+        return {
+          id: `sub_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+          status: 'queued',
+          payload,
+          createdAt: new Date().toISOString(),
+          lastAttemptAt: null,
+          submittedAt: null,
+          backupEmailAt: null,
+          lastError: null,
+          lastEmailError: null
+        };
+      }
+
+      function shouldRetry(record) {
+        if (!record || !record.lastAttemptAt) return true;
+        const lastAttempt = Date.parse(record.lastAttemptAt);
+        if (Number.isNaN(lastAttempt)) return true;
+        const diffMs = Date.now() - lastAttempt;
+        return diffMs >= (SECURITY_CONFIG.retryIntervalMinutes * 60 * 1000);
+      }
+
+      function initEmailJS() {
+        if (!SECURITY_CONFIG.email.enabled) return false;
+        if (emailJsInitialized) return true;
+        const { publicKey, serviceId, templateId, toEmail } = SECURITY_CONFIG.email;
+        if (!window.emailjs) {
+          console.warn('[Reach Form] EmailJS library not loaded yet.');
+          return false;
+        }
+        if (
+          !publicKey || !serviceId || !templateId || !toEmail ||
+          publicKey.includes('REPLACE') || serviceId.includes('REPLACE') ||
+          templateId.includes('REPLACE') || toEmail.includes('REPLACE')
+        ) {
+          console.warn('[Reach Form] EmailJS configuration is incomplete.');
+          return false;
+        }
+        window.emailjs.init(publicKey);
+        emailJsInitialized = true;
+        return true;
+      }
+
+      async function sendEmailBackup(record, errorMessage) {
+        if (!SECURITY_CONFIG.email.enabled) {
+          return { success: false, reason: 'disabled' };
+        }
+        if (!initEmailJS()) {
+          return { success: false, reason: 'not_configured' };
+        }
+
+        const latestRecord = record && record.id ? (getRecord(record.id) || record) : record;
+        const payload = latestRecord?.payload || {};
+        const templateParams = {
+          to_email: SECURITY_CONFIG.email.toEmail,
+          submission_id: latestRecord?.id || `temp_${Date.now()}`,
+          error_message: errorMessage || '',
+          submitted_at: latestRecord?.createdAt || new Date().toISOString(),
+          payload_json: JSON.stringify(payload, null, 2),
+          full_name: payload.fullName || '',
+          email: payload.email || '',
+          whatsapp: payload.whatsapp || '',
+          location: payload.location || '',
+          plan_label: payload.planLabel || payload.planValue || '',
+          currency: `${payload.currencyCode || ''} ${payload.currencySymbol || ''}`.trim(),
+          price: payload.priceDisplay || '',
+          goals: payload.goals || ''
+        };
+
+        try {
+          await window.emailjs.send(
+            SECURITY_CONFIG.email.serviceId,
+            SECURITY_CONFIG.email.templateId,
+            templateParams
+          );
+          if (queueEnabled && latestRecord?.id) {
+            updateRecord(latestRecord.id, {
+              status: 'backup_sent',
+              backupEmailAt: new Date().toISOString(),
+              lastEmailError: null,
+              lastError: errorMessage || null
+            });
+          }
+          return { success: true };
+        } catch (emailError) {
+          if (queueEnabled && latestRecord?.id) {
+            updateRecord(latestRecord.id, {
+              status: 'backup_failed',
+              backupEmailAt: new Date().toISOString(),
+              lastEmailError: emailError.message || 'Email backup failed',
+              lastError: errorMessage || null
+            });
+          }
+          console.error('[Reach Form] Backup email failed:', emailError);
+          return { success: false, error: emailError };
+        }
+      }
+
+      async function sendToAirtable(payload) {
+        const submissionBody = new URLSearchParams();
+        Object.entries(payload).forEach(([key, value]) => {
+          submissionBody.append(key, value ?? '');
+        });
+        await fetch(SECURITY_CONFIG.webhookURL, {
+          method: 'POST',
+          mode: 'no-cors',
+          body: submissionBody
+        });
+      }
+
+      async function attemptSubmissionRecord(record, options = {}) {
+        const allowBackup = options.allowBackup !== false;
+        if (!queueEnabled || !record) {
+          await sendToAirtable(record?.payload || {});
+          return { success: true, record };
+        }
+
+        const attemptIso = new Date().toISOString();
+        updateRecord(record.id, { status: 'sending', lastAttemptAt: attemptIso });
+
+        try {
+          await sendToAirtable(record.payload);
+          const updated = updateRecord(record.id, {
+            status: 'submitted',
+            submittedAt: new Date().toISOString(),
+            lastError: null
+          });
+          return { success: true, record: updated };
+        } catch (submissionError) {
+          const errorMessage = submissionError?.message || 'Network error';
+          const updated = updateRecord(record.id, {
+            status: 'queued',
+            lastError: errorMessage,
+            lastAttemptAt: attemptIso
+          });
+
+          if (!allowBackup) {
+            return { success: false, record: updated, error: errorMessage };
+          }
+
+          const backup = await sendEmailBackup(updated, errorMessage);
+          return { success: false, record: getRecord(record.id) || updated, error: errorMessage, backup };
+        }
+      }
+
+      async function attemptDirectSubmission(payload) {
+        try {
+          await sendToAirtable(payload);
+          return { success: true };
+        } catch (error) {
+          const errorMessage = error?.message || 'Network error';
+          const tempRecord = { id: `temp_${Date.now()}`, payload };
+          const backup = await sendEmailBackup(tempRecord, errorMessage);
+          return { success: false, error: errorMessage, backup };
+        }
+      }
+
+      async function processPendingQueue() {
+        if (!queueEnabled || !queueCache.length) return;
+        for (const record of [...queueCache]) {
+          if (!record || (record.status !== 'queued' && record.status !== 'backup_failed')) continue;
+          if (!shouldRetry(record)) continue;
+          try {
+            await attemptSubmissionRecord(record, { allowBackup: false });
+          } catch (error) {
+            // Automatic retries will try again later.
+          }
+        }
+      }
+
+      if (queueEnabled) {
+        setTimeout(processPendingQueue, 3000);
+        window.addEventListener('online', () => processPendingQueue());
+        setInterval(processPendingQueue, SECURITY_CONFIG.retryIntervalMinutes * 60 * 1000);
+      }
 
       function updatePriceDisplay() {
         if (!planSelect || !currencySelect || !priceDisplay || !priceValue) return;
@@ -130,7 +391,7 @@
         }
 
         priceDisplay.value = `${planConfig} ${currencyConfig.symbol}`;
-        priceValue.value = planConfig;
+        priceValue.value = String(planConfig);
       }
 
       if (planParam && planSelect) {
@@ -203,23 +464,24 @@
           sourcePage: window.location.href
         };
 
-        const submissionBody = new URLSearchParams();
-        Object.entries(payload).forEach(([key, value]) => {
-          submissionBody.append(key, value ?? '');
-        });
+        submitButton.disabled = true;
+        submitButton.textContent = 'Sending...';
+        formStatus.textContent = 'Sending your application...';
+        formStatus.classList.remove('is-error', 'is-success');
 
-        try {
-          submitButton.disabled = true;
-          submitButton.textContent = 'Sending...';
-          formStatus.textContent = 'Sending your application...';
-          formStatus.classList.remove('is-error', 'is-success');
+        let record = null;
+        if (queueEnabled) {
+          record = addRecord(createRecord(payload));
+        }
 
-          await fetch(webhookURL, {
-            method: 'POST',
-            mode: 'no-cors',
-            body: submissionBody
-          });
+        let outcome;
+        if (record) {
+          outcome = await attemptSubmissionRecord(record, { allowBackup: true });
+        } else {
+          outcome = await attemptDirectSubmission(payload);
+        }
 
+        if (outcome.success) {
           form.reset();
           if (planParam && planSelect) {
             planSelect.value = planParam;
@@ -228,15 +490,19 @@
           updatePriceDisplay();
 
           formStatus.textContent = 'Application sent! I will reach out within 24 hours.';
+          formStatus.classList.remove('is-error');
           formStatus.classList.add('is-success');
-        } catch (error) {
-          console.error('Form submission error:', error);
-          formStatus.textContent = 'Oops, something went wrong. Please try again.';
-          formStatus.classList.add('is-error');
-        } finally {
           submitButton.disabled = false;
           submitButton.textContent = 'Send my application';
+          processPendingQueue();
+          return;
         }
+
+        formStatus.textContent = CONTACT_FALLBACK_MESSAGE;
+        formStatus.classList.remove('is-success');
+        formStatus.classList.add('is-error');
+        submitButton.disabled = false;
+        submitButton.textContent = 'Send my application';
       });
     })();
   </script>

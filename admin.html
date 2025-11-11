@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Submission Safety Log | REACH by Antoine</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="preload" href="style.css" as="style" onload="this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="style.css"></noscript>
+</head>
+<body class="admin-body">
+  <header class="admin-header">
+    <div>
+      <h1>Submission Safety Log</h1>
+      <p>Review locally stored coaching applications whenever Airtable is unavailable. Resend entries, export them, or mark them as processed.</p>
+    </div>
+    <div class="admin-header-actions">
+      <a class="admin-header-link" href="index.html">← Back to site</a>
+      <a class="admin-header-link" href="form.html">Open application form</a>
+    </div>
+  </header>
+
+  <main class="admin-main">
+    <section class="admin-card">
+      <p class="admin-note" id="adminError"></p>
+      <div class="admin-stats">
+        <div class="admin-stat-card">
+          <span class="admin-stat-label">Queued / Needs action</span>
+          <span class="admin-stat-value" id="statQueued">0</span>
+        </div>
+        <div class="admin-stat-card">
+          <span class="admin-stat-label">Submitted</span>
+          <span class="admin-stat-value" id="statSubmitted">0</span>
+        </div>
+        <div class="admin-stat-card">
+          <span class="admin-stat-label">Backup emails</span>
+          <span class="admin-stat-value" id="statBackup">0</span>
+        </div>
+      </div>
+      <p class="admin-note">Only this browser can access the queue (stored via LocalStorage). Clearing browser storage will erase these entries.</p>
+    </section>
+
+    <section class="admin-card">
+      <div class="admin-card-header">
+        <h2 class="admin-card-title">Local submissions</h2>
+        <div class="admin-card-actions">
+          <button type="button" class="admin-button" id="refreshQueueBtn">Refresh</button>
+          <button type="button" class="admin-button secondary" id="resendQueueBtn">Retry all queued</button>
+          <button type="button" class="admin-button secondary" id="clearSubmittedBtn">Clear submitted</button>
+          <button type="button" class="admin-button secondary" id="exportQueueBtn">Export JSON</button>
+        </div>
+      </div>
+
+      <div class="admin-table-wrapper">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Client</th>
+              <th>Plan &amp; Price</th>
+              <th>Status</th>
+              <th>Timeline</th>
+              <th>Notes</th>
+              <th style="min-width:200px;">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="queueBody">
+            <tr class="admin-empty"><td colspan="6">No submissions stored locally.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    (function () {
+      const STORAGE_KEY = 'reachFormSubmissions';
+      const WEBHOOK_URL = 'https://hooks.airtable.com/workflows/v1/genericWebhook/appDKRjPsZbEVt0iJ/wflE1Sy1QoDzTUpHL/wtr7nw1o8KVBsecw8';
+
+      const tableBody = document.getElementById('queueBody');
+      const statQueued = document.getElementById('statQueued');
+      const statSubmitted = document.getElementById('statSubmitted');
+      const statBackup = document.getElementById('statBackup');
+      const adminError = document.getElementById('adminError');
+
+      const refreshBtn = document.getElementById('refreshQueueBtn');
+      const resendBtn = document.getElementById('resendQueueBtn');
+      const clearBtn = document.getElementById('clearSubmittedBtn');
+      const exportBtn = document.getElementById('exportQueueBtn');
+
+      const STATUS_LABELS = {
+        queued: 'Queued',
+        sending: 'Sending',
+        submitted: 'Submitted',
+        submitted_manual: 'Submitted manually',
+        backup_sent: 'Backup email sent',
+        backup_failed: 'Backup failed'
+      };
+
+      let queue = [];
+      let locking = false;
+
+      function isLocalStorageAvailable() {
+        try {
+          const testKey = '__reach_admin_test__';
+          localStorage.setItem(testKey, '1');
+          localStorage.removeItem(testKey);
+          return true;
+        } catch (error) {
+          console.error('[Reach Admin] LocalStorage unavailable:', error);
+          return false;
+        }
+      }
+
+      const storageAvailable = isLocalStorageAvailable();
+      if (!storageAvailable) {
+        adminError.textContent = 'LocalStorage is not accessible in this browser. Offline submissions cannot be viewed from this page.';
+        return;
+      } else {
+        adminError.textContent = '';
+      }
+
+      function loadQueue() {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          if (!raw) return [];
+          const parsed = JSON.parse(raw);
+          return Array.isArray(parsed) ? parsed : [];
+        } catch (error) {
+          console.error('[Reach Admin] Failed to load queue:', error);
+          return [];
+        }
+      }
+
+      function saveQueue() {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(queue));
+        } catch (error) {
+          console.error('[Reach Admin] Failed to save queue:', error);
+        }
+      }
+
+      function syncQueue() {
+        queue = loadQueue();
+      }
+
+      function formatDate(isoString) {
+        if (!isoString) return '—';
+        const date = new Date(isoString);
+        if (Number.isNaN(date.getTime())) return '—';
+        return date.toLocaleString();
+      }
+
+      function escapeHtml(text) {
+        if (!text) return '';
+        return text
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/\"/g, '&quot;')
+          .replace(/'/g, '&#039;');
+      }
+
+      function updateStats() {
+        const queuedCount = queue.filter(item => item.status === 'queued' || item.status === 'backup_failed').length;
+        const submittedCount = queue.filter(item => item.status === 'submitted' || item.status === 'submitted_manual').length;
+        const backupCount = queue.filter(item => item.status === 'backup_sent').length;
+
+        statQueued.textContent = queuedCount;
+        statSubmitted.textContent = submittedCount;
+        statBackup.textContent = backupCount;
+      }
+
+      function renderQueue() {
+        tableBody.innerHTML = '';
+        if (!queue.length) {
+          tableBody.innerHTML = '<tr class="admin-empty"><td colspan="6">No submissions stored locally.</td></tr>';
+          updateStats();
+          return;
+        }
+
+        const sorted = [...queue].sort((a, b) => {
+          const aTime = Date.parse(a.createdAt || '') || 0;
+          const bTime = Date.parse(b.createdAt || '') || 0;
+          return bTime - aTime;
+        });
+
+        sorted.forEach(record => {
+          const statusLabel = STATUS_LABELS[record.status] || record.status || 'Unknown';
+          const badgeClass = `status-badge ${record.status || 'queued'}`;
+          const goalsPreview = record.payload?.goals ? escapeHtml(record.payload.goals).slice(0, 220) : '';
+          const goalsText = goalsPreview && record.payload.goals.length > 220 ? `${goalsPreview}…` : goalsPreview;
+
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>
+              <strong>${escapeHtml(record.payload?.fullName || '—')}</strong><br>
+              ${record.payload?.email ? `<span class=\"admin-tag\">${escapeHtml(record.payload.email)}</span>` : ''}
+              ${record.payload?.whatsapp ? `<span class=\"admin-tag\">${escapeHtml(record.payload.whatsapp)}</span>` : ''}
+              ${record.payload?.location ? `<div class=\"admin-note\">Location: ${escapeHtml(record.payload.location)}</div>` : ''}
+            </td>
+            <td>
+              ${escapeHtml(record.payload?.planLabel || record.payload?.planValue || '—')}<br>
+              ${record.payload?.currencyCode ? `<span class=\"admin-tag\">${escapeHtml(record.payload.currencyCode)}</span>` : ''}
+              ${record.payload?.priceDisplay ? `<span class=\"admin-tag\">${escapeHtml(record.payload.priceDisplay)}</span>` : ''}
+            </td>
+            <td><span class=\"${badgeClass}\">${escapeHtml(statusLabel)}</span></td>
+            <td>
+              <div class=\"admin-note\">Created: ${formatDate(record.createdAt)}</div>
+              ${record.submittedAt ? `<div class=\"admin-note\">Submitted: ${formatDate(record.submittedAt)}</div>` : ''}
+              ${record.backupEmailAt ? `<div class=\"admin-note\">Backup email: ${formatDate(record.backupEmailAt)}</div>` : ''}
+              ${record.lastAttemptAt ? `<div class=\"admin-note\">Last attempt: ${formatDate(record.lastAttemptAt)}</div>` : ''}
+            </td>
+            <td>
+              ${record.lastError ? `<div class=\"admin-note\">Error: ${escapeHtml(record.lastError)}</div>` : ''}
+              ${record.lastEmailError ? `<div class=\"admin-note\">Email error: ${escapeHtml(record.lastEmailError)}</div>` : ''}
+              ${goalsText ? `<div class=\"admin-note\">Goals: ${goalsText}</div>` : ''}
+            </td>
+            <td class=\"admin-actions\">
+              <button type=\"button\" data-action=\"copy\" data-id=\"${record.id}\">Copy data</button>
+              ${(record.status === 'queued' || record.status === 'backup_failed') ? `<button type=\"button\" data-action=\"resend\" data-id=\"${record.id}\">Resend to Airtable</button>` : ''}
+              ${(record.status !== 'submitted' && record.status !== 'submitted_manual') ? `<button type=\"button\" data-action=\"mark\" data-id=\"${record.id}\">Mark submitted</button>` : ''}
+            </td>
+          `;
+          tableBody.appendChild(row);
+        });
+
+        updateStats();
+      }
+
+      async function resendRecord(recordId) {
+        const record = queue.find(item => item.id === recordId);
+        if (!record || locking) return;
+        locking = true;
+        record.status = 'sending';
+        record.lastAttemptAt = new Date().toISOString();
+        saveQueue();
+        renderQueue();
+
+        try {
+          const body = new URLSearchParams();
+          Object.entries(record.payload || {}).forEach(([key, value]) => {
+            body.append(key, value ?? '');
+          });
+          await fetch(WEBHOOK_URL, { method: 'POST', mode: 'no-cors', body });
+          record.status = 'submitted';
+          record.submittedAt = new Date().toISOString();
+          record.lastError = null;
+        } catch (error) {
+          console.error('[Reach Admin] Manual resend failed:', error);
+          record.status = 'backup_failed';
+          record.lastError = error?.message || 'Network error';
+        } finally {
+          locking = false;
+          saveQueue();
+          renderQueue();
+        }
+      }
+
+      function markSubmitted(recordId) {
+        const record = queue.find(item => item.id === recordId);
+        if (!record) return;
+        record.status = 'submitted_manual';
+        record.submittedAt = new Date().toISOString();
+        saveQueue();
+        renderQueue();
+      }
+
+      async function copyRecord(recordId) {
+        const record = queue.find(item => item.id === recordId);
+        if (!record) return;
+        try {
+          await navigator.clipboard.writeText(JSON.stringify(record, null, 2));
+        } catch (error) {
+          console.error('[Reach Admin] Unable to copy to clipboard:', error);
+          alert('Could not copy to clipboard. Please copy manually.');
+        }
+      }
+
+      async function resendAllQueued() {
+        if (locking) return;
+        const targets = queue.filter(item => item.status === 'queued' || item.status === 'backup_failed');
+        for (const record of targets) {
+          await resendRecord(record.id);
+        }
+      }
+
+      function clearSubmitted() {
+        const keep = queue.filter(item => item.status !== 'submitted' && item.status !== 'submitted_manual');
+        if (keep.length === queue.length) return;
+        queue = keep;
+        saveQueue();
+        renderQueue();
+      }
+
+      function exportQueue() {
+        const blob = new Blob([JSON.stringify(queue, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `reach-submissions-${Date.now()}.json`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+      }
+
+      tableBody.addEventListener('click', event => {
+        const button = event.target.closest('button[data-action]');
+        if (!button) return;
+        const action = button.dataset.action;
+        const recordId = button.dataset.id;
+
+        if (action === 'resend') {
+          resendRecord(recordId);
+        } else if (action === 'mark') {
+          markSubmitted(recordId);
+        } else if (action === 'copy') {
+          copyRecord(recordId);
+        }
+      });
+
+      refreshBtn.addEventListener('click', () => {
+        syncQueue();
+        renderQueue();
+      });
+
+      resendBtn.addEventListener('click', () => {
+        resendAllQueued();
+      });
+
+      clearBtn.addEventListener('click', () => {
+        const confirmClear = confirm('Remove all entries marked as submitted from this browser?');
+        if (confirmClear) {
+          clearSubmitted();
+        }
+      });
+
+      exportBtn.addEventListener('click', () => {
+        exportQueue();
+      });
+
+      window.addEventListener('storage', event => {
+        if (event.key === STORAGE_KEY) {
+          syncQueue();
+          renderQueue();
+        }
+      });
+
+      syncQueue();
+      renderQueue();
+    })();
+  </script>
+</body>
+</html>
+
