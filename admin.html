@@ -102,314 +102,313 @@
         }
       };
 
+      const initDashboard = () => {
+        const STORAGE_KEY = 'reachFormSubmissions';
+        const WEBHOOK_URL = 'https://hooks.airtable.com/workflows/v1/genericWebhook/appDKRjPsZbEVt0iJ/wflE1Sy1QoDzTUpHL/wtr7nw1o8KVBsecw8';
+
+        const tableBody = document.getElementById('queueBody');
+        const statQueued = document.getElementById('statQueued');
+        const statSubmitted = document.getElementById('statSubmitted');
+        const statBackup = document.getElementById('statBackup');
+        const adminError = document.getElementById('adminError');
+
+        const refreshBtn = document.getElementById('refreshQueueBtn');
+        const resendBtn = document.getElementById('resendQueueBtn');
+        const clearBtn = document.getElementById('clearSubmittedBtn');
+        const exportBtn = document.getElementById('exportQueueBtn');
+
+        const STATUS_LABELS = {
+          queued: 'Queued',
+          sending: 'Sending',
+          submitted: 'Submitted',
+          submitted_manual: 'Submitted manually',
+          backup_sent: 'Backup email sent',
+          backup_failed: 'Backup failed'
+        };
+
+        let queue = [];
+        let locking = false;
+
+        function isLocalStorageAvailable() {
+          try {
+            const testKey = '__reach_admin_test__';
+            localStorage.setItem(testKey, '1');
+            localStorage.removeItem(testKey);
+            return true;
+          } catch (error) {
+            console.error('[Reach Admin] LocalStorage unavailable:', error);
+            return false;
+          }
+        }
+
+        const storageAvailable = isLocalStorageAvailable();
+        if (!storageAvailable) {
+          adminError.textContent = 'LocalStorage is not accessible in this browser. Offline submissions cannot be viewed from this page.';
+          return;
+        } else {
+          adminError.textContent = '';
+        }
+
+        function loadQueue() {
+          try {
+            const raw = localStorage.getItem(STORAGE_KEY);
+            if (!raw) return [];
+            const parsed = JSON.parse(raw);
+            return Array.isArray(parsed) ? parsed : [];
+          } catch (error) {
+            console.error('[Reach Admin] Failed to load queue:', error);
+            return [];
+          }
+        }
+
+        function saveQueue() {
+          try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(queue));
+          } catch (error) {
+            console.error('[Reach Admin] Failed to save queue:', error);
+          }
+        }
+
+        function syncQueue() {
+          queue = loadQueue();
+        }
+
+        function formatDate(isoString) {
+          if (!isoString) return '—';
+          const date = new Date(isoString);
+          if (Number.isNaN(date.getTime())) return '—';
+          return date.toLocaleString();
+        }
+
+        function escapeHtml(text) {
+          if (!text) return '';
+          return text
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+        }
+
+        function updateStats() {
+          const queuedCount = queue.filter(item => item.status === 'queued' || item.status === 'backup_failed').length;
+          const submittedCount = queue.filter(item => item.status === 'submitted' || item.status === 'submitted_manual').length;
+          const backupCount = queue.filter(item => item.status === 'backup_sent').length;
+
+          statQueued.textContent = queuedCount;
+          statSubmitted.textContent = submittedCount;
+          statBackup.textContent = backupCount;
+        }
+
+        function renderQueue() {
+          tableBody.innerHTML = '';
+          if (!queue.length) {
+            tableBody.innerHTML = '<tr class="admin-empty"><td colspan="11">No submissions stored locally.</td></tr>';
+            updateStats();
+            return;
+          }
+
+          const sorted = [...queue].sort((a, b) => {
+            const aTime = Date.parse(a.createdAt || '') || 0;
+            const bTime = Date.parse(b.createdAt || '') || 0;
+            return bTime - aTime;
+          });
+
+          sorted.forEach(record => {
+            const payload = record.payload || {};
+            const statusLabel = STATUS_LABELS[record.status] || record.status || 'Unknown';
+            const badgeClass = `status-badge ${record.status || 'queued'}`;
+            const goalsPreview = payload.goals ? escapeHtml(payload.goals).slice(0, 250) : '';
+            const goalsText = goalsPreview && payload.goals.length > 250 ? `${goalsPreview}…` : goalsPreview;
+            const timelineItems = [
+              record.createdAt ? `Created: ${formatDate(record.createdAt)}` : null,
+              record.submittedAt ? `Submitted: ${formatDate(record.submittedAt)}` : null,
+              record.lastAttemptAt ? `Last attempt: ${formatDate(record.lastAttemptAt)}` : null,
+              record.backupEmailAt ? `Backup email: ${formatDate(record.backupEmailAt)}` : null,
+              record.lastError ? `Error: ${escapeHtml(record.lastError)}` : null,
+              record.lastEmailError ? `Email error: ${escapeHtml(record.lastEmailError)}` : null
+            ].filter(Boolean);
+
+            const row = document.createElement('tr');
+            row.innerHTML = `
+              <td><strong>${escapeHtml(payload.fullName || '—')}</strong></td>
+              <td>${payload.email ? `<a href="mailto:${escapeHtml(payload.email)}">${escapeHtml(payload.email)}</a>` : '—'}</td>
+              <td>${payload.whatsapp ? `<a href="https://wa.me/${encodeURIComponent(payload.whatsapp.replace(/[^0-9+]/g,''))}" target="_blank" rel="noopener noreferrer">${escapeHtml(payload.whatsapp)}</a>` : '—'}</td>
+              <td>${escapeHtml(payload.location || '—')}</td>
+              <td>${escapeHtml(payload.planLabel || payload.planValue || '—')}</td>
+              <td>${escapeHtml(payload.currencyCode ? `${payload.currencyCode} ${payload.currencySymbol || ''}`.trim() : '—')}</td>
+              <td>${escapeHtml(payload.priceDisplay || '—')}</td>
+              <td>${goalsText || '—'}</td>
+              <td><span class="${badgeClass}">${escapeHtml(statusLabel)}</span></td>
+              <td>${timelineItems.length ? timelineItems.map(item => `<div class="admin-note">${item}</div>`).join('') : '<span class="admin-note">No timeline data</span>'}</td>
+              <td class="admin-actions">
+                <button type="button" data-action="copy" data-id="${record.id}">Copy data</button>
+                ${(record.status === 'queued' || record.status === 'backup_failed') ? `<button type="button" data-action="resend" data-id="${record.id}">Resend to Airtable</button>` : ''}
+                ${(record.status !== 'submitted' && record.status !== 'submitted_manual') ? `<button type="button" data-action="mark" data-id="${record.id}">Mark submitted</button>` : ''}
+              </td>
+            `;
+            tableBody.appendChild(row);
+          });
+
+          updateStats();
+        }
+
+        async function resendRecord(recordId) {
+          const record = queue.find(item => item.id === recordId);
+          if (!record || locking) return;
+          locking = true;
+          record.status = 'sending';
+          record.lastAttemptAt = new Date().toISOString();
+          saveQueue();
+          renderQueue();
+
+          try {
+            const body = new URLSearchParams();
+            Object.entries(record.payload || {}).forEach(([key, value]) => {
+              body.append(key, value ?? '');
+            });
+            await fetch(WEBHOOK_URL, { method: 'POST', mode: 'no-cors', body });
+            record.status = 'submitted';
+            record.submittedAt = new Date().toISOString();
+            record.lastError = null;
+          } catch (error) {
+            console.error('[Reach Admin] Manual resend failed:', error);
+            record.status = 'backup_failed';
+            record.lastError = error?.message || 'Network error';
+          } finally {
+            locking = false;
+            saveQueue();
+            renderQueue();
+          }
+        }
+
+        function markSubmitted(recordId) {
+          const record = queue.find(item => item.id === recordId);
+          if (!record) return;
+          record.status = 'submitted_manual';
+          record.submittedAt = new Date().toISOString();
+          saveQueue();
+          renderQueue();
+        }
+
+        async function copyRecord(recordId) {
+          const record = queue.find(item => item.id === recordId);
+          if (!record) return;
+          try {
+            await navigator.clipboard.writeText(JSON.stringify(record, null, 2));
+          } catch (error) {
+            console.error('[Reach Admin] Unable to copy to clipboard:', error);
+            alert('Could not copy to clipboard. Please copy manually.');
+          }
+        }
+
+        async function resendAllQueued() {
+          if (locking) return;
+          const targets = queue.filter(item => item.status === 'queued' || item.status === 'backup_failed');
+          for (const record of targets) {
+            await resendRecord(record.id);
+          }
+        }
+
+        function clearSubmitted() {
+          const keep = queue.filter(item => item.status !== 'submitted' && item.status !== 'submitted_manual');
+          if (keep.length === queue.length) return;
+          queue = keep;
+          saveQueue();
+          renderQueue();
+        }
+
+        function exportQueue() {
+          const blob = new Blob([JSON.stringify(queue, null, 2)], { type: 'application/json' });
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.href = url;
+          link.download = `reach-submissions-${Date.now()}.json`;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          URL.revokeObjectURL(url);
+        }
+
+        tableBody.addEventListener('click', event => {
+          const button = event.target.closest('button[data-action]');
+          if (!button) return;
+          const action = button.dataset.action;
+          const recordId = button.dataset.id;
+
+          if (action === 'resend') {
+            resendRecord(recordId);
+          } else if (action === 'mark') {
+            markSubmitted(recordId);
+          } else if (action === 'copy') {
+            copyRecord(recordId);
+          }
+        });
+
+        refreshBtn.addEventListener('click', () => {
+          syncQueue();
+          renderQueue();
+        });
+
+        resendBtn.addEventListener('click', () => {
+          resendAllQueued();
+        });
+
+        clearBtn.addEventListener('click', () => {
+          const confirmClear = confirm('Remove all entries marked as submitted from this browser?');
+          if (confirmClear) {
+            clearSubmitted();
+          }
+        });
+
+        exportBtn.addEventListener('click', () => {
+          exportQueue();
+        });
+
+        window.addEventListener('storage', event => {
+          if (event.key === STORAGE_KEY) {
+            syncQueue();
+            renderQueue();
+          }
+        });
+
+        syncQueue();
+        renderQueue();
+      };
+
       const passwordConfigured = ACCESS_PASSWORD && ACCESS_PASSWORD !== 'REPLACE_WITH_PASSWORD';
 
-      if (passwordConfigured) {
-        if (sessionStorage.getItem('adminAccessGranted') === 'true') {
-          showContent();
-          if (gateEl) {
-            gateEl.remove();
-          }
-        } else {
-          if (gateEl && gateForm && gateInput && gateError) {
-            gateEl.style.display = 'flex';
-            gateForm.addEventListener('submit', function (event) {
-              event.preventDefault();
-              if ((gateInput.value || '').trim() === ACCESS_PASSWORD) {
-                sessionStorage.setItem('adminAccessGranted', 'true');
-                gateError.textContent = '';
-                gateInput.value = '';
-                showContent();
-                gateEl.style.display = 'none';
-                gateEl.remove();
-                window.location.reload();
-              } else {
-                gateError.textContent = 'Incorrect password. Try again.';
-                gateInput.value = '';
-                gateInput.focus();
-              }
-            });
-          }
-          return;
-        }
-      } else {
+      if (!passwordConfigured) {
         showContent();
         if (gateEl) {
           gateEl.remove();
         }
-      }
-
-      const STORAGE_KEY = 'reachFormSubmissions';
-      const WEBHOOK_URL = 'https://hooks.airtable.com/workflows/v1/genericWebhook/appDKRjPsZbEVt0iJ/wflE1Sy1QoDzTUpHL/wtr7nw1o8KVBsecw8';
-
-      const tableBody = document.getElementById('queueBody');
-      const statQueued = document.getElementById('statQueued');
-      const statSubmitted = document.getElementById('statSubmitted');
-      const statBackup = document.getElementById('statBackup');
-      const adminError = document.getElementById('adminError');
-
-      const refreshBtn = document.getElementById('refreshQueueBtn');
-      const resendBtn = document.getElementById('resendQueueBtn');
-      const clearBtn = document.getElementById('clearSubmittedBtn');
-      const exportBtn = document.getElementById('exportQueueBtn');
-
-      const STATUS_LABELS = {
-        queued: 'Queued',
-        sending: 'Sending',
-        submitted: 'Submitted',
-        submitted_manual: 'Submitted manually',
-        backup_sent: 'Backup email sent',
-        backup_failed: 'Backup failed'
-      };
-
-      let queue = [];
-      let locking = false;
-
-      function isLocalStorageAvailable() {
-        try {
-          const testKey = '__reach_admin_test__';
-          localStorage.setItem(testKey, '1');
-          localStorage.removeItem(testKey);
-          return true;
-        } catch (error) {
-          console.error('[Reach Admin] LocalStorage unavailable:', error);
-          return false;
-        }
-      }
-
-      const storageAvailable = isLocalStorageAvailable();
-      if (!storageAvailable) {
-        adminError.textContent = 'LocalStorage is not accessible in this browser. Offline submissions cannot be viewed from this page.';
+        initDashboard();
         return;
-      } else {
-        adminError.textContent = '';
       }
 
-      function loadQueue() {
-        try {
-          const raw = localStorage.getItem(STORAGE_KEY);
-          if (!raw) return [];
-          const parsed = JSON.parse(raw);
-          return Array.isArray(parsed) ? parsed : [];
-        } catch (error) {
-          console.error('[Reach Admin] Failed to load queue:', error);
-          return [];
-        }
+      if (!gateEl || !gateForm || !gateInput || !gateError) {
+        console.error('[Reach Admin] Access gate elements missing.');
+        return;
       }
 
-      function saveQueue() {
-        try {
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(queue));
-        } catch (error) {
-          console.error('[Reach Admin] Failed to save queue:', error);
-        }
-      }
-
-      function syncQueue() {
-        queue = loadQueue();
-      }
-
-      function formatDate(isoString) {
-        if (!isoString) return '—';
-        const date = new Date(isoString);
-        if (Number.isNaN(date.getTime())) return '—';
-        return date.toLocaleString();
-      }
-
-      function escapeHtml(text) {
-        if (!text) return '';
-        return text
-          .replace(/&/g, '&amp;')
-          .replace(/</g, '&lt;')
-          .replace(/>/g, '&gt;')
-          .replace(/\"/g, '&quot;')
-          .replace(/'/g, '&#039;');
-      }
-
-      function updateStats() {
-        const queuedCount = queue.filter(item => item.status === 'queued' || item.status === 'backup_failed').length;
-        const submittedCount = queue.filter(item => item.status === 'submitted' || item.status === 'submitted_manual').length;
-        const backupCount = queue.filter(item => item.status === 'backup_sent').length;
-
-        statQueued.textContent = queuedCount;
-        statSubmitted.textContent = submittedCount;
-        statBackup.textContent = backupCount;
-      }
-
-      function renderQueue() {
-        tableBody.innerHTML = '';
-        if (!queue.length) {
-          tableBody.innerHTML = '<tr class="admin-empty"><td colspan="11">No submissions stored locally.</td></tr>';
-          updateStats();
-          return;
-        }
-
-        const sorted = [...queue].sort((a, b) => {
-          const aTime = Date.parse(a.createdAt || '') || 0;
-          const bTime = Date.parse(b.createdAt || '') || 0;
-          return bTime - aTime;
-        });
-
-        sorted.forEach(record => {
-          const payload = record.payload || {};
-          const statusLabel = STATUS_LABELS[record.status] || record.status || 'Unknown';
-          const badgeClass = `status-badge ${record.status || 'queued'}`;
-          const goalsPreview = payload.goals ? escapeHtml(payload.goals).slice(0, 250) : '';
-          const goalsText = goalsPreview && payload.goals.length > 250 ? `${goalsPreview}…` : goalsPreview;
-          const timelineItems = [
-            record.createdAt ? `Created: ${formatDate(record.createdAt)}` : null,
-            record.submittedAt ? `Submitted: ${formatDate(record.submittedAt)}` : null,
-            record.lastAttemptAt ? `Last attempt: ${formatDate(record.lastAttemptAt)}` : null,
-            record.backupEmailAt ? `Backup email: ${formatDate(record.backupEmailAt)}` : null,
-            record.lastError ? `Error: ${escapeHtml(record.lastError)}` : null,
-            record.lastEmailError ? `Email error: ${escapeHtml(record.lastEmailError)}` : null
-          ].filter(Boolean);
-
-          const row = document.createElement('tr');
-          row.innerHTML = `
-            <td><strong>${escapeHtml(payload.fullName || '—')}</strong></td>
-            <td>${payload.email ? `<a href="mailto:${escapeHtml(payload.email)}">${escapeHtml(payload.email)}</a>` : '—'}</td>
-            <td>${payload.whatsapp ? `<a href="https://wa.me/${encodeURIComponent(payload.whatsapp.replace(/[^0-9+]/g,''))}" target="_blank" rel="noopener noreferrer">${escapeHtml(payload.whatsapp)}</a>` : '—'}</td>
-            <td>${escapeHtml(payload.location || '—')}</td>
-            <td>${escapeHtml(payload.planLabel || payload.planValue || '—')}</td>
-            <td>${escapeHtml(payload.currencyCode ? `${payload.currencyCode} ${payload.currencySymbol || ''}`.trim() : '—')}</td>
-            <td>${escapeHtml(payload.priceDisplay || '—')}</td>
-            <td>${goalsText || '—'}</td>
-            <td><span class="${badgeClass}">${escapeHtml(statusLabel)}</span></td>
-            <td>${timelineItems.length ? timelineItems.map(item => `<div class="admin-note">${item}</div>`).join('') : '<span class="admin-note">No timeline data</span>'}</td>
-            <td class="admin-actions">
-              <button type="button" data-action="copy" data-id="${record.id}">Copy data</button>
-              ${(record.status === 'queued' || record.status === 'backup_failed') ? `<button type="button" data-action="resend" data-id="${record.id}">Resend to Airtable</button>` : ''}
-              ${(record.status !== 'submitted' && record.status !== 'submitted_manual') ? `<button type="button" data-action="mark" data-id="${record.id}">Mark submitted</button>` : ''}
-            </td>
-          `;
-          tableBody.appendChild(row);
-        });
-
-        updateStats();
-      }
-
-      async function resendRecord(recordId) {
-        const record = queue.find(item => item.id === recordId);
-        if (!record || locking) return;
-        locking = true;
-        record.status = 'sending';
-        record.lastAttemptAt = new Date().toISOString();
-        saveQueue();
-        renderQueue();
-
-        try {
-          const body = new URLSearchParams();
-          Object.entries(record.payload || {}).forEach(([key, value]) => {
-            body.append(key, value ?? '');
-          });
-          await fetch(WEBHOOK_URL, { method: 'POST', mode: 'no-cors', body });
-          record.status = 'submitted';
-          record.submittedAt = new Date().toISOString();
-          record.lastError = null;
-        } catch (error) {
-          console.error('[Reach Admin] Manual resend failed:', error);
-          record.status = 'backup_failed';
-          record.lastError = error?.message || 'Network error';
-        } finally {
-          locking = false;
-          saveQueue();
-          renderQueue();
-        }
-      }
-
-      function markSubmitted(recordId) {
-        const record = queue.find(item => item.id === recordId);
-        if (!record) return;
-        record.status = 'submitted_manual';
-        record.submittedAt = new Date().toISOString();
-        saveQueue();
-        renderQueue();
-      }
-
-      async function copyRecord(recordId) {
-        const record = queue.find(item => item.id === recordId);
-        if (!record) return;
-        try {
-          await navigator.clipboard.writeText(JSON.stringify(record, null, 2));
-        } catch (error) {
-          console.error('[Reach Admin] Unable to copy to clipboard:', error);
-          alert('Could not copy to clipboard. Please copy manually.');
-        }
-      }
-
-      async function resendAllQueued() {
-        if (locking) return;
-        const targets = queue.filter(item => item.status === 'queued' || item.status === 'backup_failed');
-        for (const record of targets) {
-          await resendRecord(record.id);
-        }
-      }
-
-      function clearSubmitted() {
-        const keep = queue.filter(item => item.status !== 'submitted' && item.status !== 'submitted_manual');
-        if (keep.length === queue.length) return;
-        queue = keep;
-        saveQueue();
-        renderQueue();
-      }
-
-      function exportQueue() {
-        const blob = new Blob([JSON.stringify(queue, null, 2)], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = `reach-submissions-${Date.now()}.json`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(url);
-      }
-
-      tableBody.addEventListener('click', event => {
-        const button = event.target.closest('button[data-action]');
-        if (!button) return;
-        const action = button.dataset.action;
-        const recordId = button.dataset.id;
-
-        if (action === 'resend') {
-          resendRecord(recordId);
-        } else if (action === 'mark') {
-          markSubmitted(recordId);
-        } else if (action === 'copy') {
-          copyRecord(recordId);
+      contentEl.style.display = 'none';
+      gateEl.style.display = 'flex';
+      gateForm.addEventListener('submit', function (event) {
+        event.preventDefault();
+        if ((gateInput.value || '').trim() === ACCESS_PASSWORD) {
+          gateError.textContent = '';
+          gateInput.value = '';
+          gateEl.style.display = 'none';
+          gateEl.remove();
+          showContent();
+          initDashboard();
+        } else {
+          gateError.textContent = 'Incorrect password. Try again.';
+          gateInput.value = '';
+          gateInput.focus();
         }
       });
-
-      refreshBtn.addEventListener('click', () => {
-        syncQueue();
-        renderQueue();
-      });
-
-      resendBtn.addEventListener('click', () => {
-        resendAllQueued();
-      });
-
-      clearBtn.addEventListener('click', () => {
-        const confirmClear = confirm('Remove all entries marked as submitted from this browser?');
-        if (confirmClear) {
-          clearSubmitted();
-        }
-      });
-
-      exportBtn.addEventListener('click', () => {
-        exportQueue();
-      });
-
-      window.addEventListener('storage', event => {
-        if (event.key === STORAGE_KEY) {
-          syncQueue();
-          renderQueue();
-        }
-      });
-
-      syncQueue();
-      renderQueue();
     })();
   </script>
 </body>
