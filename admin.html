@@ -18,67 +18,69 @@
       <button type="submit" class="admin-access-submit">Unlock</button>
     </form>
   </div>
-  <header class="admin-header">
-    <div>
-      <h1>Submission Safety Log</h1>
-      <p>Review locally stored coaching applications whenever Airtable is unavailable. Resend entries, export them, or mark them as processed.</p>
-    </div>
-    <div class="admin-header-actions">
-      <a class="admin-header-link" href="index.html">← Back to site</a>
-      <a class="admin-header-link" href="form.html">Open application form</a>
-    </div>
-  </header>
-
-  <main class="admin-main">
-    <section class="admin-card">
-      <p class="admin-note" id="adminError"></p>
-      <div class="admin-stats">
-        <div class="admin-stat-card">
-          <span class="admin-stat-label">Queued / Needs action</span>
-          <span class="admin-stat-value" id="statQueued">0</span>
-        </div>
-        <div class="admin-stat-card">
-          <span class="admin-stat-label">Submitted</span>
-          <span class="admin-stat-value" id="statSubmitted">0</span>
-        </div>
-        <div class="admin-stat-card">
-          <span class="admin-stat-label">Backup emails</span>
-          <span class="admin-stat-value" id="statBackup">0</span>
-        </div>
+  <div id="adminContent" class="admin-content">
+    <header class="admin-header">
+      <div>
+        <h1>Submission Safety Log</h1>
+        <p>Review locally stored coaching applications whenever Airtable is unavailable. Resend entries, export them, or mark them as processed.</p>
       </div>
-      <p class="admin-note">Only this browser can access the queue (stored via LocalStorage). Clearing browser storage will erase these entries.</p>
-    </section>
+      <div class="admin-header-actions">
+        <a class="admin-header-link" href="index.html">← Back to site</a>
+        <a class="admin-header-link" href="form.html">Open application form</a>
+      </div>
+    </header>
 
-    <section class="admin-card">
-      <div class="admin-card-header">
-        <h2 class="admin-card-title">Local submissions</h2>
-        <div class="admin-card-actions">
-          <button type="button" class="admin-button" id="refreshQueueBtn">Refresh</button>
-          <button type="button" class="admin-button secondary" id="resendQueueBtn">Retry all queued</button>
-          <button type="button" class="admin-button secondary" id="clearSubmittedBtn">Clear submitted</button>
-          <button type="button" class="admin-button secondary" id="exportQueueBtn">Export JSON</button>
+    <main class="admin-main">
+      <section class="admin-card">
+        <p class="admin-note" id="adminError"></p>
+        <div class="admin-stats">
+          <div class="admin-stat-card">
+            <span class="admin-stat-label">Queued / Needs action</span>
+            <span class="admin-stat-value" id="statQueued">0</span>
+          </div>
+          <div class="admin-stat-card">
+            <span class="admin-stat-label">Submitted</span>
+            <span class="admin-stat-value" id="statSubmitted">0</span>
+          </div>
+          <div class="admin-stat-card">
+            <span class="admin-stat-label">Backup emails</span>
+            <span class="admin-stat-value" id="statBackup">0</span>
+          </div>
         </div>
-      </div>
+        <p class="admin-note">Only this browser can access the queue (stored via LocalStorage). Clearing browser storage will erase these entries.</p>
+      </section>
 
-      <div class="admin-table-wrapper">
-        <table class="admin-table">
-          <thead>
-            <tr>
-              <th>Client</th>
-              <th>Plan &amp; Price</th>
-              <th>Status</th>
-              <th>Timeline</th>
-              <th>Notes</th>
-              <th style="min-width:200px;">Actions</th>
-            </tr>
-          </thead>
-          <tbody id="queueBody">
-            <tr class="admin-empty"><td colspan="6">No submissions stored locally.</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </section>
-  </main>
+      <section class="admin-card">
+        <div class="admin-card-header">
+          <h2 class="admin-card-title">Local submissions</h2>
+          <div class="admin-card-actions">
+            <button type="button" class="admin-button" id="refreshQueueBtn">Refresh</button>
+            <button type="button" class="admin-button secondary" id="resendQueueBtn">Retry all queued</button>
+            <button type="button" class="admin-button secondary" id="clearSubmittedBtn">Clear submitted</button>
+            <button type="button" class="admin-button secondary" id="exportQueueBtn">Export JSON</button>
+          </div>
+        </div>
+
+        <div class="admin-table-wrapper">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Client</th>
+                <th>Plan &amp; Price</th>
+                <th>Status</th>
+                <th>Timeline</th>
+                <th>Notes</th>
+                <th style="min-width:200px;">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="queueBody">
+              <tr class="admin-empty"><td colspan="6">No submissions stored locally.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
 
   <script>
     (function () {
@@ -87,11 +89,19 @@
       const gateForm = document.getElementById('accessForm');
       const gateInput = document.getElementById('accessInput');
       const gateError = document.getElementById('accessError');
+      const contentEl = document.getElementById('adminContent');
+
+      const showContent = () => {
+        if (contentEl) {
+          contentEl.style.display = 'block';
+        }
+      };
 
       const passwordConfigured = ACCESS_PASSWORD && ACCESS_PASSWORD !== 'REPLACE_WITH_PASSWORD';
 
       if (passwordConfigured) {
         if (sessionStorage.getItem('adminAccessGranted') === 'true') {
+          showContent();
           if (gateEl) {
             gateEl.remove();
           }
@@ -104,6 +114,7 @@
                 sessionStorage.setItem('adminAccessGranted', 'true');
                 gateError.textContent = '';
                 gateInput.value = '';
+                showContent();
                 gateEl.style.display = 'none';
                 gateEl.remove();
                 window.location.reload();
@@ -116,8 +127,11 @@
           }
           return;
         }
-      } else if (gateEl) {
-        gateEl.remove();
+      } else {
+        showContent();
+        if (gateEl) {
+          gateEl.remove();
+        }
       }
 
       const STORAGE_KEY = 'reachFormSubmissions';
