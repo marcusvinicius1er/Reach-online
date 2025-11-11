@@ -203,23 +203,22 @@
           sourcePage: window.location.href
         };
 
+        const submissionBody = new URLSearchParams();
+        Object.entries(payload).forEach(([key, value]) => {
+          submissionBody.append(key, value ?? '');
+        });
+
         try {
           submitButton.disabled = true;
           submitButton.textContent = 'Sending...';
           formStatus.textContent = 'Sending your application...';
           formStatus.classList.remove('is-error', 'is-success');
 
-          const response = await fetch(webhookURL, {
+          await fetch(webhookURL, {
             method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(payload)
+            mode: 'no-cors',
+            body: submissionBody
           });
-
-          if (!response.ok) {
-            throw new Error('Non-200 response');
-          }
 
           form.reset();
           if (planParam && planSelect) {
