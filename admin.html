@@ -9,6 +9,15 @@
   <noscript><link rel="stylesheet" href="style.css"></noscript>
 </head>
 <body class="admin-body">
+  <div class="admin-access-overlay" id="accessGate" role="dialog" aria-modal="true">
+    <form class="admin-access-form" id="accessForm">
+      <h2>Restricted Area</h2>
+      <p>Enter the access password to view submissions.</p>
+      <input type="password" id="accessInput" name="accessInput" placeholder="Password" autocomplete="current-password" required>
+      <p class="admin-access-error" id="accessError"></p>
+      <button type="submit" class="admin-access-submit">Unlock</button>
+    </form>
+  </div>
   <header class="admin-header">
     <div>
       <h1>Submission Safety Log</h1>
@@ -73,6 +82,44 @@
 
   <script>
     (function () {
+      const ACCESS_PASSWORD = 'AntoinE1968!';
+      const gateEl = document.getElementById('accessGate');
+      const gateForm = document.getElementById('accessForm');
+      const gateInput = document.getElementById('accessInput');
+      const gateError = document.getElementById('accessError');
+
+      const passwordConfigured = ACCESS_PASSWORD && ACCESS_PASSWORD !== 'REPLACE_WITH_PASSWORD';
+
+      if (passwordConfigured) {
+        if (sessionStorage.getItem('adminAccessGranted') === 'true') {
+          if (gateEl) {
+            gateEl.remove();
+          }
+        } else {
+          if (gateEl && gateForm && gateInput && gateError) {
+            gateEl.style.display = 'flex';
+            gateForm.addEventListener('submit', function (event) {
+              event.preventDefault();
+              if ((gateInput.value || '').trim() === ACCESS_PASSWORD) {
+                sessionStorage.setItem('adminAccessGranted', 'true');
+                gateError.textContent = '';
+                gateInput.value = '';
+                gateEl.style.display = 'none';
+                gateEl.remove();
+                window.location.reload();
+              } else {
+                gateError.textContent = 'Incorrect password. Try again.';
+                gateInput.value = '';
+                gateInput.focus();
+              }
+            });
+          }
+          return;
+        }
+      } else if (gateEl) {
+        gateEl.remove();
+      }
+
       const STORAGE_KEY = 'reachFormSubmissions';
       const WEBHOOK_URL = 'https://hooks.airtable.com/workflows/v1/genericWebhook/appDKRjPsZbEVt0iJ/wflE1Sy1QoDzTUpHL/wtr7nw1o8KVBsecw8';
 
