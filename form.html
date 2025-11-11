@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Apply for Online Coaching | REACH by Antoine</title>
+  <meta name="description" content="Complete the short form to apply for REACH online coaching with coach Antoine.">
+  <link rel="preload" href="style.css" as="style" onload="this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="style.css"></noscript>
+</head>
+<body class="form-body">
+  <header class="form-header">
+    <div class="form-header-inner">
+      <a href="index.html" class="form-logo" aria-label="Return to homepage">
+        <img src="01-IMAGES/logo_reach.webp" alt="REACH by Antoine" width="160" height="60" loading="lazy">
+      </a>
+      <p class="form-header-text">Step 1 · Tell me about you</p>
+    </div>
+  </header>
+
+  <main class="form-main">
+    <section class="form-intro">
+      <h1>Start Your Online Coaching Application</h1>
+      <p>Fill in the form below so I can prepare your personalized coaching plan. I will review your application and get back to you within 24 hours.</p>
+    </section>
+
+    <form class="coaching-form" id="coachingForm" novalidate>
+      <div class="form-grid">
+        <label class="form-field">
+          <span>Full name *</span>
+          <input type="text" name="fullName" id="fullName" autocomplete="name" required>
+        </label>
+
+        <label class="form-field">
+          <span>Email *</span>
+          <input type="email" name="email" id="email" autocomplete="email" required>
+        </label>
+
+        <label class="form-field">
+          <span>WhatsApp number *</span>
+          <input type="tel" name="whatsapp" id="whatsapp" autocomplete="tel" placeholder="+44 0000 000000" required>
+        </label>
+
+        <label class="form-field">
+          <span>Where are you based?</span>
+          <input type="text" name="location" id="location" placeholder="City, Country">
+        </label>
+
+        <label class="form-field">
+          <span>Preferred commitment *</span>
+          <select name="plan" id="selectedPlan" required>
+            <option value="">Select a plan</option>
+            <option value="1-month">1 Month</option>
+            <option value="3-months">3 Months</option>
+            <option value="6-months">6 Months</option>
+          </select>
+        </label>
+
+        <label class="form-field">
+          <span>Preferred currency *</span>
+          <select name="currency" id="currency" required>
+            <option value="">Select currency</option>
+            <option value="AED" selected>AED 🇦🇪</option>
+            <option value="AUD">AUD 🇦🇺</option>
+            <option value="EUR">EUR 🇪🇺</option>
+          </select>
+        </label>
+
+        <label class="form-field">
+          <span>Package price</span>
+          <input type="text" id="priceDisplay" placeholder="Select plan & currency" readonly>
+          <input type="hidden" name="price" id="priceValue">
+        </label>
+
+        <label class="form-field form-field-wide">
+          <span>What are your goals right now?</span>
+          <textarea name="goals" id="goals" rows="4" placeholder="Tell me about your current situation, objectives, and any challenges."></textarea>
+        </label>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="form-submit-button">Send my application</button>
+        <p class="form-disclaimer">No payment is required at this stage. I will contact you personally to finalize everything.</p>
+      </div>
+      <p class="form-status-message" id="formStatus" aria-live="polite"></p>
+    </form>
+
+  </main>
+
+  <footer class="form-footer">
+    <p>© <span id="formYear"></span> REACH by Antoine. All rights reserved.</p>
+  </footer>
+
+  <script>
+    (function () {
+      const params = new URLSearchParams(window.location.search);
+      const planParam = params.get('plan');
+      const planSelect = document.getElementById('selectedPlan');
+      const currencySelect = document.getElementById('currency');
+      const priceDisplay = document.getElementById('priceDisplay');
+      const priceValue = document.getElementById('priceValue');
+      const webhookURL = 'https://hooks.airtable.com/workflows/v1/genericWebhook/appDKRjPsZbEVt0iJ/wflE1Sy1QoDzTUpHL/wtr7nw1o8KVBsecw8';
+      const form = document.getElementById('coachingForm');
+      const formFields = form.querySelectorAll('input[required], select[required]');
+      const submitButton = form.querySelector('.form-submit-button');
+      const formStatus = document.getElementById('formStatus');
+      const footerYear = document.getElementById('formYear');
+      footerYear.textContent = new Date().getFullYear();
+
+      const pricingMatrix = {
+        AED: { symbol: 'AED', plans: { '1-month': 1000, '3-months': 2700, '6-months': 4800 } },
+        AUD: { symbol: 'AUD', plans: { '1-month': 480, '3-months': 1170, '6-months': 2400 } },
+        EUR: { symbol: '€', plans: { '1-month': 250, '3-months': 675, '6-months': 1200 } }
+      };
+
+      const defaultCurrency = currencySelect?.value || 'AED';
+
+      function updatePriceDisplay() {
+        if (!planSelect || !currencySelect || !priceDisplay || !priceValue) return;
+        const planValue = planSelect.value;
+        const currencyValue = currencySelect.value;
+        const currencyConfig = pricingMatrix[currencyValue];
+        const planConfig = currencyConfig?.plans?.[planValue];
+
+        if (!planConfig) {
+          priceDisplay.value = '';
+          priceDisplay.placeholder = 'Select plan & currency';
+          priceValue.value = '';
+          return;
+        }
+
+        priceDisplay.value = `${planConfig} ${currencyConfig.symbol}`;
+        priceValue.value = planConfig;
+      }
+
+      if (planParam && planSelect) {
+        const match = Array.from(planSelect.options).find(option => option.value === planParam);
+        if (match) {
+          planSelect.value = planParam;
+        }
+      }
+
+      updatePriceDisplay();
+
+      if (planSelect) {
+        planSelect.addEventListener('change', updatePriceDisplay);
+      }
+
+      if (currencySelect) {
+        currencySelect.addEventListener('change', updatePriceDisplay);
+      }
+
+      form.addEventListener('submit', async function (event) {
+        event.preventDefault();
+        let isValid = true;
+
+        formFields.forEach(field => {
+          if (!field.checkValidity()) {
+            field.classList.add('form-error');
+            isValid = false;
+          } else {
+            field.classList.remove('form-error');
+          }
+        });
+
+        if (!isValid) {
+          form.reportValidity();
+          return;
+        }
+
+        updatePriceDisplay();
+
+        const fullName = document.getElementById('fullName').value.trim();
+        const email = document.getElementById('email').value.trim();
+        const whatsapp = document.getElementById('whatsapp').value.trim();
+        const location = document.getElementById('location').value.trim();
+        const goals = document.getElementById('goals').value.trim();
+        const planValue = planSelect.value;
+        const planLabel = planSelect.options[planSelect.selectedIndex].textContent;
+        const currencyValue = currencySelect.value;
+        const currencyConfig = pricingMatrix[currencyValue];
+        const packagePrice = currencyConfig?.plans?.[planValue];
+
+        if (!currencyConfig || !packagePrice) {
+          formStatus.textContent = 'Please select a plan and currency to calculate the price.';
+          formStatus.classList.add('is-error');
+          return;
+        }
+
+        const payload = {
+          fullName,
+          email,
+          whatsapp,
+          location,
+          goals,
+          planValue,
+          planLabel,
+          currencyCode: currencyValue,
+          currencySymbol: currencyConfig.symbol,
+          priceTotal: packagePrice,
+          priceDisplay: `${packagePrice} ${currencyConfig.symbol}`,
+          submittedAt: new Date().toISOString(),
+          sourcePage: window.location.href
+        };
+
+        try {
+          submitButton.disabled = true;
+          submitButton.textContent = 'Sending...';
+          formStatus.textContent = 'Sending your application...';
+          formStatus.classList.remove('is-error', 'is-success');
+
+          const response = await fetch(webhookURL, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload)
+          });
+
+          if (!response.ok) {
+            throw new Error('Non-200 response');
+          }
+
+          form.reset();
+          if (planParam && planSelect) {
+            planSelect.value = planParam;
+          }
+          currencySelect.value = defaultCurrency;
+          updatePriceDisplay();
+
+          formStatus.textContent = 'Application sent! I will reach out within 24 hours.';
+          formStatus.classList.add('is-success');
+        } catch (error) {
+          console.error('Form submission error:', error);
+          formStatus.textContent = 'Oops, something went wrong. Please try again.';
+          formStatus.classList.add('is-error');
+        } finally {
+          submitButton.disabled = false;
+          submitButton.textContent = 'Send my application';
+        }
+      });
+    })();
+  </script>
+</body>
+</html>
+
