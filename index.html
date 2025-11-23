@@ -342,8 +342,50 @@
   <!-- ContentSquare -->
   <script src="https://t.contentsquare.net/uxa/6f17786e21554.js"></script>
 
+  <!-- Promo Configuration -->
+  <script src="promo-config.js"></script>
+
 </head>
 <body>
+
+<!-- Promotion Popup - Design Minimaliste -->
+<div class="promo-popup-overlay" id="promoPopup">
+  <div class="promo-popup">
+    <button class="promo-popup-close" onclick="closePromoPopup()" aria-label="Close popup">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+        <line x1="5" y1="5" x2="15" y2="15"></line>
+        <line x1="15" y1="5" x2="5" y2="15"></line>
+      </svg>
+    </button>
+    
+    <!-- Top Ribbon -->
+    <div class="promo-popup-ribbon promo-popup-ribbon-top">
+      <span class="ribbon-text" id="ribbonTopText">BLACK FRIDAY • BIG SALE</span>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="promo-popup-content">
+      <div class="promo-popup-special" id="promoSpecial">SPECIAL SALE</div>
+      <h1 class="promo-popup-main-title">
+        <span class="title-black" id="promoTitleBlack">BLACK</span>
+        <span class="title-orange" id="promoTitleOrange">FRIDAY</span>
+      </h1>
+      <div class="promo-popup-offer-text" id="promoOfferText">Get <span class="offer-highlight" id="offerMonths">3</span> <span class="offer-highlight" id="offerMonthsText">MONTHS</span> of free coaching</div>
+      <div class="promo-popup-deadline" id="promoDeadline">
+        <span class="deadline-text">Offer ends: <strong id="deadlineDate"></strong></span>
+      </div>
+      <button class="promo-popup-btn" onclick="claimPromoOffer()" id="promoCta">
+        <span>CLAIM THE OFFER</span>
+      </button>
+    </div>
+    
+    <!-- Bottom Ribbon -->
+    <div class="promo-popup-ribbon promo-popup-ribbon-bottom">
+      <span class="ribbon-text" id="ribbonBottomText">BLACK FRIDAY • BIG SALE</span>
+    </div>
+  </div>
+</div>
+
 
 <!-- Preloader -->
 <div id="preloader" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 9999; display: flex; align-items: center; justify-content: center;">
@@ -951,7 +993,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       </div>
 
       <div class="pricing-card" data-plan-duration="3">
-        <div class="most-popular-badge">Most popular</div>
         <h3 class="plan-title">3 Months</h3>
         <div class="price-wrapper">
           <div class="price" data-plan-total></div>
@@ -969,7 +1010,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       </div>
 
       <div class="pricing-card best-value" data-plan-duration="6">
-        <div class="best-value-badge">Best value</div>
         <h3 class="plan-title">6 Months</h3>
         <div class="price-wrapper">
           <div class="price" data-plan-total></div>
@@ -1440,5 +1480,122 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 </footer>
 
 <script src="main.min.js" defer></script>
+
+<!-- Promotion Popup Script -->
+<script>
+(function() {
+  'use strict';
+  
+  // Fonctions de gestion du popup
+  function showPromoPopup() {
+    if (!isPromoActive()) return;
+    
+    // Vérifier si le popup a déjà été fermé dans cette session
+    if (PROMO_CONFIG.popup.showOncePerSession && sessionStorage.getItem('promoPopupClosed')) {
+      return;
+    }
+    
+    const popup = document.getElementById('promoPopup');
+    if (!popup) return;
+    
+    // Mettre à jour les textes du popup
+    const texts = getPopupTexts();
+    const specialEl = document.getElementById('promoSpecial');
+    const titleBlackEl = document.getElementById('promoTitleBlack');
+    const titleOrangeEl = document.getElementById('promoTitleOrange');
+    const offerTextEl = document.getElementById('promoOfferText');
+    const deadlineEl = document.getElementById('deadlineDate');
+    const ctaEl = document.getElementById('promoCta');
+    const ribbonTopEl = document.getElementById('ribbonTopText');
+    const ribbonBottomEl = document.getElementById('ribbonBottomText');
+    
+    // Extraire les textes sans emojis
+    const badgeText = texts.badge.replace(/🔥|🎄|🐰|⚡/g, '').trim();
+    const badgeWords = badgeText.split(' ');
+    
+    // Calculer l'offre de coaching gratuite
+    let freeMonths = 3;
+    let freeMonthsText = 'MONTHS';
+    if (typeof PROMO_CONFIG !== 'undefined' && PROMO_CONFIG.offers) {
+      const offers = PROMO_CONFIG.offers;
+      if (offers[6] && offers[6].enabled) {
+        freeMonths = offers[6].extraMonths;
+        freeMonthsText = freeMonths > 1 ? 'MONTHS' : 'MONTH';
+      } else if (offers[3] && offers[3].enabled) {
+        freeMonths = offers[3].extraMonths;
+        freeMonthsText = freeMonths > 1 ? 'MONTHS' : 'MONTH';
+      }
+    }
+    
+    if (specialEl) specialEl.textContent = 'SPECIAL SALE';
+    if (titleBlackEl) titleBlackEl.textContent = badgeWords[0] || 'BLACK';
+    if (titleOrangeEl) titleOrangeEl.textContent = badgeWords[1] || 'FRIDAY';
+    const monthsEl = document.getElementById('offerMonths');
+    const monthsTextEl = document.getElementById('offerMonthsText');
+    if (monthsEl) monthsEl.textContent = freeMonths;
+    if (monthsTextEl) monthsTextEl.textContent = freeMonthsText;
+    if (deadlineEl) deadlineEl.textContent = formatEndDate();
+    if (ctaEl) {
+      const ctaText = texts.cta.replace(/🎁/g, '').trim();
+      const ctaSpan = ctaEl.querySelector('span');
+      if (ctaSpan) ctaSpan.textContent = ctaText;
+    }
+    if (ribbonTopEl) ribbonTopEl.textContent = `${badgeText} • BIG SALE`;
+    if (ribbonBottomEl) ribbonBottomEl.textContent = `${badgeText} • BIG SALE`;
+    
+    // Afficher le popup après le délai configuré
+    setTimeout(() => {
+      popup.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }, PROMO_CONFIG.popup.delay || 3000);
+  }
+  
+  function closePromoPopup() {
+    const popup = document.getElementById('promoPopup');
+    if (popup) {
+      popup.classList.remove('active');
+      document.body.style.overflow = 'auto';
+      if (PROMO_CONFIG.popup.showOncePerSession) {
+        sessionStorage.setItem('promoPopupClosed', 'true');
+      }
+    }
+  }
+  
+  function claimPromoOffer() {
+    closePromoPopup();
+    // Scroll vers la section pricing
+    const pricingSection = document.getElementById('pricing');
+    if (pricingSection) {
+      pricingSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }
+  
+  // Fermer le popup en cliquant à l'extérieur
+  document.addEventListener('click', function(event) {
+    const popup = document.getElementById('promoPopup');
+    if (popup && event.target === popup) {
+      closePromoPopup();
+    }
+  });
+  
+  // Fermer avec la touche Escape
+  document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+      closePromoPopup();
+    }
+  });
+  
+  // Exposer les fonctions globalement
+  window.closePromoPopup = closePromoPopup;
+  window.claimPromoOffer = claimPromoOffer;
+  
+  // Afficher le popup au chargement de la page
+  window.addEventListener('load', function() {
+    // Attendre que le DOM soit complètement chargé
+    setTimeout(showPromoPopup, 100);
+  });
+})();
+</script>
+
 </body>
 </html>
