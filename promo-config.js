@@ -15,7 +15,7 @@ const PROMO_CONFIG = {
   
   // Dates de la promotion (format ISO: YYYY-MM-DDTHH:mm:ss)
   startDate: '2025-11-22T00:00:00',
-  endDate: '2025-12-31T23:59:59',
+  endDate: '2025-11-30T23:59:59',
   
   // Configuration du popup
   popup: {
