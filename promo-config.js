@@ -19,7 +19,7 @@ const PROMO_CONFIG = {
   
   // Configuration du popup
   popup: {
-    delay: 3000, // Délai avant affichage (en millisecondes)
+    delay: 4000, // Délai avant affichage (en millisecondes)
     showOncePerSession: true, // Afficher une seule fois par session
   },
   
