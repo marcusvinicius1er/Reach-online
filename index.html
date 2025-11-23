@@ -1486,6 +1486,12 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 (function() {
   'use strict';
   
+  // Vérifier que promo-config.js est chargé
+  if (typeof PROMO_CONFIG === 'undefined' || typeof isPromoActive === 'undefined' || typeof getPopupTexts === 'undefined' || typeof formatEndDate === 'undefined') {
+    console.error('[Reach Promo] promo-config.js must be loaded before this script');
+    return;
+  }
+  
   // Fonctions de gestion du popup
   function showPromoPopup() {
     if (!isPromoActive()) return;
@@ -1590,10 +1596,22 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   window.claimPromoOffer = claimPromoOffer;
   
   // Afficher le popup au chargement de la page
-  window.addEventListener('load', function() {
+  function initPromoPopup() {
+    // Vérifier à nouveau que tout est chargé
+    if (typeof PROMO_CONFIG === 'undefined' || typeof isPromoActive === 'undefined') {
+      console.warn('[Reach Promo] Waiting for promo-config.js to load...');
+      setTimeout(initPromoPopup, 100);
+      return;
+    }
     // Attendre que le DOM soit complètement chargé
     setTimeout(showPromoPopup, 100);
-  });
+  }
+  
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initPromoPopup);
+  } else {
+    window.addEventListener('load', initPromoPopup);
+  }
 })();
 </script>
 
