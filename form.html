@@ -80,8 +80,8 @@
           <span>Preferred currency *</span>
           <select name="currency" id="currency" required>
             <option value="">Select currency</option>
-            <option value="AED" selected>AED 🇦🇪</option>
-            <option value="AUD">AUD 🇦🇺</option>
+            <option value="AUD" selected>AUD 🇦🇺</option>
+            <option value="AED">AED 🇦🇪</option>
             <option value="EUR">EUR 🇪🇺</option>
           </select>
         </label>
@@ -157,7 +157,7 @@
         EUR: { symbol: '€', plans: { '1-month': 250, '3-months': 675, '6-months': 1200 } }
       };
 
-      const defaultCurrency = currencySelect?.value || 'AED';
+      const defaultCurrency = currencySelect?.value || 'AUD';
 
       function checkLocalStorageAvailable() {
         try {
