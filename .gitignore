@@ -5,3 +5,8 @@
 
 # Design source files
 *.psd
+
+# Cloudflare Worker secrets (si vous créez un fichier local)
+wrangler.toml.local
+.env
+.env.local

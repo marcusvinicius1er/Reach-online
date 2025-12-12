@@ -1,0 +1,30 @@
+name = "reach-form-submit"
+main = "cloudflare-worker.js"
+compatibility_date = "2024-01-01"
+
+# Variables d'environnement pour le développement local
+# ⚠️ IMPORTANT: Ne pas commiter les vraies valeurs en production
+# Utilisez le dashboard Cloudflare pour les variables de production
+[vars]
+# Remplacez par votre URL Airtable webhook
+AIRTABLE_WEBHOOK_URL = "https://hooks.airtable.com/workflows/v1/genericWebhook/appDKRjPsZbEVt0iJ/wflE1Sy1QoDzTUpHL/wtr7nw1o8KVBsecw8"
+# Votre domaine (ou * pour autoriser tous)
+ALLOWED_ORIGIN = "*"
+# Nombre max de requêtes par IP par heure
+RATE_LIMIT_MAX_REQUESTS = "10"
+# Mode: development ou production
+ENVIRONMENT = "development"
+
+# KV Namespace pour le rate limiting
+# ⚠️ Créez d'abord le namespace dans Cloudflare Dashboard, puis remplacez l'ID ci-dessous
+# [[kv_namespaces]]
+# binding = "RATE_LIMIT_KV"
+# id = "your-kv-namespace-id-here"
+
+# Configuration pour différents environnements
+[env.production]
+vars = { ENVIRONMENT = "production" }
+
+[env.development]
+vars = { ENVIRONMENT = "development" }
+
