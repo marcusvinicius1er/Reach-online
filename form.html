@@ -40,50 +40,8 @@
 
   <main class="form-main">
     <section class="form-intro">
-      <div class="form-free-badge">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M9 11l3 3L22 4"></path>
-          <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
-        </svg>
-        <span>No payment required</span>
-      </div>
       <h1>Start Your Online Coaching Application</h1>
-      <h2 class="form-subtitle">Tell me more about you.</h2>
-      <p class="form-description">Complete this quick form so I can understand your situation and goals. Then we'll chat on WhatsApp to see how I can best help you.</p>
-    </section>
-
-    <section class="form-next-steps">
-      <h3>What Happens Next?</h3>
-      <p class="next-steps-description">I'll review your application within 24 hours and reach out on WhatsApp to discuss your goals and answer any questions.</p>
-      <div class="next-steps-grid">
-        <div class="next-step-card">
-          <div class="next-step-icon">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="12" cy="12" r="10"></circle>
-              <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
-              <line x1="12" y1="17" x2="12.01" y2="17"></line>
-            </svg>
-          </div>
-          <h4>No payment yet</h4>
-        </div>
-        <div class="next-step-card">
-          <div class="next-step-icon">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-            </svg>
-          </div>
-          <h4>No commitment</h4>
-        </div>
-        <div class="next-step-card">
-          <div class="next-step-icon">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="12" cy="12" r="10"></circle>
-              <polyline points="12 6 12 12 16 14"></polyline>
-            </svg>
-          </div>
-          <h4>Reply within 24 hours</h4>
-        </div>
-      </div>
+      <p>Fill in the form below so I can prepare your personalized coaching plan. I will review your application and get back to you within 24 hours.</p>
     </section>
 
     <form class="coaching-form" id="coachingForm" novalidate>
@@ -106,6 +64,38 @@
         <label class="form-field">
           <span>Where are you based?</span>
           <input type="text" name="location" id="location" placeholder="City, Country">
+        </label>
+
+        <label class="form-field">
+          <span>Preferred commitment *</span>
+          <select name="plan" id="selectedPlan" required>
+            <option value="">Select a plan</option>
+            <option value="1-month">1 Month</option>
+            <option value="3-months">3 Months</option>
+            <option value="6-months">6 Months</option>
+          </select>
+        </label>
+
+        <label class="form-field">
+          <span>Preferred currency *</span>
+          <select name="currency" id="currency" required>
+            <option value="">Select currency</option>
+            <option value="AUD" selected>AUD 🇦🇺</option>
+            <option value="AED">AED 🇦🇪</option>
+            <option value="EUR">EUR 🇪🇺</option>
+          </select>
+        </label>
+
+        <label class="form-field form-field-wide">
+          <span>Package price</span>
+          <div style="display: flex; gap: 12px; align-items: flex-start;">
+            <div id="priceDisplay" style="flex: 1; padding: 14px 16px; border-radius: 12px; border: 1px solid rgba(0,0,0,0.12); background: #fbfbfb; font-size: 16px; color: #1a1a1a; min-height: 48px; display: flex; align-items: center;"></div>
+            <div id="savingBlock" style="display: none; background: #ff6413; color: #fff; padding: 12px 18px; border-radius: 12px; font-weight: 700; font-size: 14px; text-align: center; min-width: 140px; white-space: nowrap; box-shadow: 0 4px 12px rgba(255,100,19,0.3);">
+              <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.95; margin-bottom: 4px;">You Save</div>
+              <div id="savingAmount" style="font-size: 18px; font-weight: 900;"></div>
+            </div>
+          </div>
+          <input type="hidden" name="price" id="priceValue">
         </label>
 
         <label class="form-field form-field-wide">
@@ -149,12 +139,25 @@
         : 'your-email@example.com';
 
       const params = new URLSearchParams(window.location.search);
+      const planParam = params.get('plan');
+      const planSelect = document.getElementById('selectedPlan');
+      const currencySelect = document.getElementById('currency');
+      const priceDisplay = document.getElementById('priceDisplay');
+      const priceValue = document.getElementById('priceValue');
       const form = document.getElementById('coachingForm');
       const formFields = form.querySelectorAll('input[required], select[required]');
       const submitButton = form.querySelector('.form-submit-button');
       const formStatus = document.getElementById('formStatus');
       const footerYear = document.getElementById('formYear');
       footerYear.textContent = new Date().getFullYear();
+
+      const pricingMatrix = {
+        AED: { symbol: 'AED', plans: { '1-month': 1000, '3-months': 2700, '6-months': 4800 } },
+        AUD: { symbol: 'AUD', plans: { '1-month': 480, '3-months': 1300, '6-months': 2300 } },
+        EUR: { symbol: '€', plans: { '1-month': 250, '3-months': 675, '6-months': 1200 } }
+      };
+
+      const defaultCurrency = currencySelect?.value || 'AUD';
 
       function checkLocalStorageAvailable() {
         try {
@@ -286,6 +289,9 @@
           email: payload.email || '',
           whatsapp: payload.whatsapp || '',
           location: payload.location || '',
+          plan_label: payload.planLabel || payload.planValue || '',
+          currency: `${payload.currencyCode || ''} ${payload.currencySymbol || ''}`.trim(),
+          price: payload.priceDisplay || '',
           goals: payload.goals || ''
         };
 
@@ -396,6 +402,87 @@
         setInterval(processPendingQueue, SECURITY_CONFIG.retryIntervalMinutes * 60 * 1000);
       }
 
+      function updatePriceDisplay() {
+        if (!planSelect || !currencySelect || !priceDisplay || !priceValue) return;
+        const planValue = planSelect.value;
+        const currencyValue = currencySelect.value;
+        const currencyConfig = pricingMatrix[currencyValue];
+        const planConfig = currencyConfig?.plans?.[planValue];
+        const savingBlock = document.getElementById('savingBlock');
+        const savingAmount = document.getElementById('savingAmount');
+
+        if (!planConfig) {
+          priceDisplay.innerHTML = '';
+          priceDisplay.style.color = '#999';
+          priceDisplay.textContent = 'Select plan & currency';
+          priceValue.value = '';
+          if (savingBlock) savingBlock.style.display = 'none';
+          return;
+        }
+        
+        priceDisplay.style.color = '#1a1a1a';
+
+        // Vérifier si la promotion est active
+        const promoActive = typeof isPromoActive === 'function' ? isPromoActive() : false;
+        let displayText = `${planConfig} ${currencyConfig.symbol}`;
+        let saving = 0;
+        
+        if (promoActive && typeof PROMO_CONFIG !== 'undefined') {
+          const planDuration = planValue === '1-month' ? 1 : planValue === '3-months' ? 3 : 6;
+          const offer = PROMO_CONFIG.offers[planDuration];
+          
+          if (offer && offer.enabled) {
+            const totalDuration = planDuration + offer.extraMonths;
+            const promoText = `(${planDuration} months + ${offer.extraMonths} FREE = ${totalDuration} months total)`;
+            displayText = `${planConfig} ${currencyConfig.symbol} - <span style="color: #ff6413; font-weight: 700;"> ${promoText}</span>`;
+            
+            // Calculer le saving
+            const oneMonthPrice = pricingMatrix[currencyValue].plans['1-month'];
+            const totalIfNormalPrice = oneMonthPrice * totalDuration;
+            saving = totalIfNormalPrice - planConfig;
+          }
+        } else {
+          // Calculer le saving normal (sans promo)
+          const planDuration = planValue === '1-month' ? 1 : planValue === '3-months' ? 3 : 6;
+          if (planDuration > 1) {
+            const oneMonthPrice = pricingMatrix[currencyValue].plans['1-month'];
+            const totalIfMonthly = oneMonthPrice * planDuration;
+            saving = totalIfMonthly - planConfig;
+          }
+        }
+
+        // Afficher le champ prix avec HTML pour la couleur orange
+        priceDisplay.innerHTML = displayText;
+        priceValue.value = String(planConfig);
+        
+        // Afficher le bloc de saving si > 0
+        if (savingBlock && savingAmount) {
+          if (saving > 0) {
+            savingAmount.textContent = `${saving} ${currencyConfig.symbol}`;
+            savingBlock.style.display = 'block';
+          } else {
+            savingBlock.style.display = 'none';
+          }
+        }
+      }
+
+      if (planParam && planSelect) {
+        const match = Array.from(planSelect.options).find(option => option.value === planParam);
+        if (match) {
+          planSelect.value = planParam;
+        }
+      }
+
+      updatePriceDisplay();
+
+      if (planSelect) {
+        planSelect.addEventListener('change', updatePriceDisplay);
+      }
+
+      if (currencySelect) {
+        currencySelect.addEventListener('change', updatePriceDisplay);
+      }
+
       form.addEventListener('submit', async function (event) {
         event.preventDefault();
         let isValid = true;
@@ -414,11 +501,24 @@
           return;
         }
 
+        updatePriceDisplay();
+
         const fullName = document.getElementById('fullName').value.trim();
         const email = document.getElementById('email').value.trim();
         const whatsapp = document.getElementById('whatsapp').value.trim();
         const location = document.getElementById('location').value.trim();
         const goals = document.getElementById('goals').value.trim();
+        const planValue = planSelect.value;
+        const planLabel = planSelect.options[planSelect.selectedIndex].textContent;
+        const currencyValue = currencySelect.value;
+        const currencyConfig = pricingMatrix[currencyValue];
+        const packagePrice = currencyConfig?.plans?.[planValue];
+
+        if (!currencyConfig || !packagePrice) {
+          formStatus.textContent = 'Please select a plan and currency to calculate the price.';
+          formStatus.classList.add('is-error');
+          return;
+        }
 
         const payload = {
           fullName,
@@ -426,6 +526,12 @@
           whatsapp,
           location,
           goals,
+          planValue,
+          planLabel,
+          currencyCode: currencyValue,
+          currencySymbol: currencyConfig.symbol,
+          priceTotal: packagePrice,
+          priceDisplay: `${packagePrice} ${currencyConfig.symbol}`,
           submittedAt: new Date().toISOString(),
           sourcePage: window.location.href
         };
@@ -449,6 +555,12 @@
 
         if (outcome.success) {
           form.reset();
+          if (planParam && planSelect) {
+            planSelect.value = planParam;
+          }
+          currencySelect.value = defaultCurrency;
+          updatePriceDisplay();
+
           formStatus.textContent = 'Application sent! I will reach out within 24 hours.';
           window.dataLayer = window.dataLayer || [];
           window.dataLayer.push({
