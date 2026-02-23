@@ -1,0 +1,7 @@
+# Worker-only deployment (no static assets).
+# Build command should be: npx wrangler deploy
+# Do NOT add an [assets] section — this worker is a script only.
+
+name = "worker-reach-online"
+main = "worker.js"
+compatibility_date = "2026-01-04"
