@@ -5,7 +5,11 @@
  * Environment variables (Cloudflare Dashboard → Worker → Settings → Variables):
  * - AIRTABLE_BASE_ID, AIRTABLE_TABLE_ID, AIRTABLE_TOKEN (Airtable API)
  * - ADMIN_PASSWORD (admin.html access, Secret)
- * - ALLOWED_ORIGIN (optional), RATE_LIMIT_MAX_REQUESTS (optional)
+ * - ALLOWED_ORIGIN (required in production) — one origin or comma-separated list, e.g.:
+ *     https://online.reach.fitness
+ *     https://online.reach.fitness,https://reach-online.pages.dev
+ *   Do NOT use "*" — it allows any site to call this Worker and can cause high traffic/abuse.
+ * - RATE_LIMIT_MAX_REQUESTS (optional, default 10), RATE_LIMIT_KV (optional KV namespace for rate limiting)
  */
 
 export default {
@@ -77,12 +81,48 @@ function constantTimeCompare(a, b) {
   return result === 0;
 }
 
-async function handleFormSubmission(request, env) {
-  const origin = request.headers.get('Origin');
-  const allowedOrigin = env.ALLOWED_ORIGIN || '*';
+function getAllowedOrigins(env) {
+  const raw = (env.ALLOWED_ORIGIN || '').trim();
+  if (!raw) return [];
+  return raw.split(',').map(o => o.trim()).filter(Boolean);
+}
 
-  if (allowedOrigin !== '*' && origin && !origin.includes(allowedOrigin)) {
-    return new Response('Forbidden origin', { status: 403, headers: getCORSHeaders(origin, env) });
+function isOriginAllowed(origin, env) {
+  const allowed = getAllowedOrigins(env);
+  if (allowed.length === 0) return false;
+  return allowed.includes(origin);
+}
+
+function getRequestOrigin(request) {
+  const o = request.headers.get('Origin');
+  if (o) return o;
+  const ref = request.headers.get('Referer');
+  if (!ref) return '';
+  try {
+    return new URL(ref).origin;
+  } catch {
+    return '';
+  }
+}
+
+async function handleFormSubmission(request, env) {
+  const origin = getRequestOrigin(request);
+  const allowed = getAllowedOrigins(env);
+
+  // Require ALLOWED_ORIGIN to be set in production (no "*")
+  if (allowed.length === 0) {
+    return new Response(JSON.stringify({ error: 'Server misconfiguration: no allowed origins' }), {
+      status: 503,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  }
+
+  // Reject requests without Origin/Referer (e.g. bots, curl) or from unknown domains
+  if (!origin || !isOriginAllowed(origin, env)) {
+    return new Response(JSON.stringify({ error: 'Forbidden origin' }), {
+      status: 403,
+      headers: { 'Content-Type': 'application/json', ...getCORSHeaders(origin, env) }
+    });
   }
 
   const clientIP = request.headers.get('CF-Connecting-IP') || 'unknown';
@@ -149,7 +189,8 @@ async function handleFormSubmission(request, env) {
         'Location': sanitizeString(payload.location || ''),
         'Goals': sanitizeString(payload.goals || ''),
         'Submitted At': payload.submittedAt || new Date().toISOString(),
-        'Source Page': (payload.sourcePage && payload.sourcePage.trim()) || ''
+        'Source Page': (payload.sourcePage && payload.sourcePage.trim()) || '',
+        'Origin': origin
       }
     };
 
@@ -189,8 +230,9 @@ function handleCORS(request, env) {
 }
 
 function getCORSHeaders(origin, env) {
-  const allowedOrigin = env.ALLOWED_ORIGIN || '*';
-  const corsOrigin = allowedOrigin === '*' ? (origin || '*') : allowedOrigin;
+  const allowed = getAllowedOrigins(env);
+  // Only echo the request origin if it's in the allowed list; never use "*"
+  const corsOrigin = (origin && allowed.length && isOriginAllowed(origin, env)) ? origin : (allowed[0] || '');
   return {
     'Access-Control-Allow-Origin': corsOrigin,
     'Access-Control-Allow-Methods': 'POST, OPTIONS',
