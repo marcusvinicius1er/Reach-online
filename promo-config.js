@@ -8,7 +8,7 @@
 
 const PROMO_CONFIG = {
   // Activation/désactivation en 1 clic
-  enabled: true,
+  enabled: false,
   
   // Type de promotion (black-friday, noel, paques, custom)
   type: 'black-friday',
